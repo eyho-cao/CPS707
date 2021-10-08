@@ -27,6 +27,13 @@ class User():
             collection.insert_one(user) 
         else:
             raise ValueError('Username is not unique')
+
+    def getUser(self, username):
+        # get a user 
+        query = {"username": username}
+        result = collection.find(query) 
+
+        return result 
         
     def deleteUser(self):
         #delete user from database 
