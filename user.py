@@ -93,18 +93,24 @@ class User():
         Add credit to user's account 
         """
 
-        #update the credit in the database
-        self.credit += credit 
-        query = {"username:", self.username}
-        newCredit = { "$set": {
-            "credit": self.credit + credit
-        }}
-        collection.update_one(query, newCredit)
+        if(credit > 0):
+            if(self.credit + credit > 999999):
+                #update credit in database
+                self.credit += credit 
+                query = {"username:", self.username}
+                newCredit = { "$set": {
+                    "credit": self.credit + credit
+                }}
+                collection.update_one(query, newCredit)
 
-        #add the transaction to the daily transaction file 
-        transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
-        f = open("daily_transaction_file.txt", "a") 
-        f.write(transaction) 
+                #add the transaction to the daily transaction file 
+                transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+                f = open("daily_transaction_file.txt", "a") 
+                f.write(transaction) 
+            else:
+                raise ValueError("Exceeds credit limit")
+        else:
+            raise ValueError("Value must be greater than zero")
 
     def logout(self): 
         """
@@ -126,6 +132,31 @@ class User():
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
 
+    def refund(self, other, credit):
+        """
+        Issue a refund from self (seller) to other (buyer) of amount credit 
+        """
 
+        #Check if other user exists 
+        buyerQuery = {"username:", other.username}
+        if(len(collection.find_one(buyerQuery) == 1) and credit > 0):
+            #Make appropriate changes to each respective users' accounts 
+            if(self.credit + credit > 999999):
+                #Check if transaction will cause seller to exceed maximum credit limit 
+                sellerQuery = {"username:", self.username}
+                sellerCredit = { "$set": {
+                    "credit": self.credit + credit
+                }}
+                buyerCredit = { "$set": {
+                    "credit": self.credit - credit
+                }}
+                collection.update_one(buyerQuery, buyerCredit)
+                collection.update_one(sellerQuery, sellerCredit)
+            else:
+                raise ValueError("Seller is over credit limit")
+        elif(len(collection.find_one(buyerQuery) == 0)):
+            raise ValueError("Buyer does not exist")
+        elif(credit < 0):
+            raise ValueError("Invalid value for credit")
 
 
