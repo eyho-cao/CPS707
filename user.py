@@ -26,16 +26,34 @@ class User():
             self.username = username 
             self.type = type 
             self.credit = credit 
+            self.status = "online"
+
+            #shorthand symbol for account type, for use of daily transaction file
+            match self.type:
+                case 'admin':
+                    self.typeShort = 'AA'
+                case 'full-standard':
+                    self.typeShort = 'FS'
+                case 'buy-standard':
+                    self.typeShort = 'BS'
+                case 'sell-standard':
+                    self.typeShort = 'SS'
 
             #add the user to the database
-            user = {"username": self.username, "type": self.type, "credit": self.credit}
+            user = {"username": self.username, "type": self.type, "credit": self.credit, "status": self.status}
             collection.insert_one(user) 
+
+            #add this transaction to the daily transaction file 
+            transaction = "01" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+            f = open("daily_transaction_file.txt", "a") 
+            f.write(transaction) 
+
         else:
             raise ValueError('Username is not unique')
 
     def __str__(self):
         """
-        string formatting for instances of User object 
+        string formatting for instances of User object
 
         u = User('trinh','admin')
         print(u)
@@ -60,18 +78,54 @@ class User():
         """
         Deletes user from database
         """
+
+        #delete the user from the database 
         collection.delete_one({"username": self.username})
+
+        #add this transaction to the daily transaction file 
+        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+        f = open("daily_transaction_file.txt", "a") 
+        f.write(transaction) 
+
 
     def addCredit(self, credit):
         """
         Add credit to user's account 
         """
 
+        #update the credit in the database
         self.credit += credit 
         query = {"username:", self.username}
         newCredit = { "$set": {
             "credit": self.credit + credit
         }}
         collection.update_one(query, newCredit)
+
+        #add the transaction to the daily transaction file 
+        transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+        f = open("daily_transaction_file.txt", "a") 
+        f.write(transaction) 
+
+    def logout(self): 
+        """
+        Logout of current session
+        """
+
+        #Set user's status to offline in db 
+        if(self.status == "online"):
+            query = {"username:", self.username}
+            newCredit = { "$set": {
+            "status": "offline"
+            }}
+            collection.update_one(query, newCredit)
+        else:
+            raise ValueError('User status error')
+        
+        #add the transaction to the daily transaction file 
+        transaction = '02' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+        f = open("daily_transaction_file.txt", "a") 
+        f.write(transaction) 
+
+
 
 
