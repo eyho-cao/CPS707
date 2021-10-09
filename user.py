@@ -11,6 +11,11 @@ collection = db["users"]
 class User():
 
     def __init__(self, username, type, credit=0): 
+        """
+        Constructor for User object 
+
+        Default credit value to zero, unless other value is specified 
+        """
 
         #check if the username is unique
         query = {"username": username} 
@@ -28,19 +33,39 @@ class User():
         else:
             raise ValueError('Username is not unique')
 
-    def getUser(self, username):
-        # get a user 
+    def __str__(self):
+        """
+        string formatting for instances of User object 
+
+        u = User('trinh','admin')
+        print(u)
+
+        >>> User(username='trinh', type='admin', credit=0)
+        """
+        return f'User(username={self.username}, type={self.type}, credit{self.credit}'
+
+    def __repr__(self):
+        return f'User(username={self.username}, type={self.type}, credit{self.credit}'
+
+    def getUser(username):
+        """
+        Return User object based on unique username
+        """
         query = {"username": username}
         result = collection.find(query) 
 
         return result 
         
     def deleteUser(self):
-        #delete user from database 
+        """
+        Deletes user from database
+        """
         collection.delete_one({"username": self.username})
 
     def addCredit(self, credit):
-        #add more credit to user's account
+        """
+        Add credit to user's account 
+        """
 
         self.credit += credit 
         query = {"username:", self.username}
@@ -48,3 +73,5 @@ class User():
             "credit": self.credit + credit
         }}
         collection.update_one(query, newCredit)
+
+
