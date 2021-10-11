@@ -23,11 +23,11 @@ class BSUser(User):
         validTitle = True
         titlePrice = 19.99
         if(not validSN):
-            print("Invalid Seller");
+            raise ValueError("Invalid Seller");
         if(not validTitle):
-            print("Invalid Title");
+            raise ValueError("Invalid Title");
         if(numTickets > 4):
-            print("Number of tickets bought cannot exceed 4")
+            raise ValueError("Number of tickets bought cannot exceed 4")
         remainingTick = 999-numTickets #999 needs to be replaced with remaining tickets from db
         if(remainingTick >=0):
             print("Price per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
