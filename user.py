@@ -77,11 +77,9 @@ class User():
         """
         Return a User instance's username 
         """
-<<<<<<< Updated upstream
         return self.username
 
     def getCredit(self):
-=======
         """
         #delete the user from the database 
         collection.delete_one({"username": self.username})
@@ -94,7 +92,6 @@ class User():
 
 
     def addCredit(self, credit):
->>>>>>> Stashed changes
         """
         Return a User instance's credit 
         """
@@ -126,12 +123,8 @@ class User():
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
 
-<<<<<<< Updated upstream
-
-=======
     def refund(self, seller, buyer, credit):
         raise ValueError("Insufficient Permissions")
->>>>>>> Stashed changes
 
     def create(self, username, userType):
         raise ValueError("Insufficient Permissions")

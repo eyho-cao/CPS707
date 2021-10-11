@@ -35,7 +35,9 @@ class BSUser(User):
             #python has no switch case? switch case not implemented until 3.10
             if(userInput == "Y" or userInput == "yes" or userInput == "Yes"):
                 #confirm transaction - decrease number of tickets from db - add to transaction line
+                transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(numTickets + ("_" * (3 - len(str(numTickets))))) + "_" + str(titlePrice + ("_" * (6 - len(str(titlePrice)))))
+                f = open("daily_transaction_file.txt", "a") 
+                f.write(transaction) 
                 print("Transaction Confirmed")
-                doStuff = 0
             else:
                 print("Transaction Cancelled")

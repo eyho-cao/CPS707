@@ -42,6 +42,9 @@ class AdminUser(User):
             #python has no switch case? switch case not implemented until 3.10
             if(userInput == "Y" or userInput == "yes" or userInput == "Yes"):
                 #confirm transaction - decrease number of tickets from db - add to transaction line
+                transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(numTickets + ("_" * (3 - len(str(numTickets))))) + "_" + str(titlePrice + ("_" * (6 - len(str(titlePrice)))))
+                f = open("daily_transaction_file.txt", "a") 
+                f.write(transaction) 
                 print("Transaction Confirmed")
                 doStuff = 0
             else:
@@ -66,6 +69,9 @@ class AdminUser(User):
            raise ValueError("Event cannot have more than 100 tickets")
         #do stuff
         #add to transaction file NOTE: since the event cant sell tickets until after the seller user logs off i think it might be best if we run a routine right before logging out that then adds the event
+        transaction = "03" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(numTickets + ("_" * (3 - len(str(numTickets))))) + "_" + str(titlePrice + ("_" * (6 - len(str(titlePrice)))))
+        f = open("daily_transaction_file.txt", "a") 
+        f.write(transaction) 
         print("Event Created - " +"Event Name: " +title +"Ticket Price: " +price +" Number of tickets to be sold: " +numTickets)
 
     def delete(self, username):
@@ -80,7 +86,7 @@ class AdminUser(User):
             f = open("daily_transaction_file.txt", "a") 
             f.write(transaction) 
 
-    def refund(self, buyer, seller, credit):
+    def refund(self, buyer, seller, amount):
         """
         Issue a refund from self (seller) to other (buyer) of amount credit 
         """
@@ -90,16 +96,19 @@ class AdminUser(User):
         sellerQuery = {"username:", seller.username}
         if(len(collection.find_one(buyerQuery) == 1) and credit > 0 and len(collection.find_one(sellerQuery) == 1)):
             #Make appropriate changes to each respective users' accounts 
-            if(self.credit + credit > 999999):
+            if(self.credit + amount > 999999):
                 #Check if transaction will cause seller to exceed maximum credit limit 
                 sellerCredit = { "$set": {
-                    "credit": seller.credit + credit
+                    "credit": seller.credit + amount
                 }}
                 buyerCredit = { "$set": {
-                    "credit": seller.credit - credit
+                    "credit": seller.credit - amount
                 }}
                 collection.update_one(buyerQuery, buyerCredit)
                 collection.update_one(sellerQuery, sellerCredit)
+                transaction = "05" + str(buyer.username + ("_" * (15 - len(buyer.username)))) + "_" + seller.username + ("_" * (15 - len(seller.username)))) + "_" + str(amount + ("_" * (9 - len(str(amount)))))
+                f = open("daily_transaction_file.txt", "a") 
+                f.write(transaction) 
             else:
                 raise ValueError("Seller is over credit limit")
         elif(len(collection.find_one(buyerQuery) == 0)):
