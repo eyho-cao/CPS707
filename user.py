@@ -21,33 +21,31 @@ class User():
         query = {"username": username} 
         result = collection.find(query) 
 
+        #check if usename exceeds character limit 
+        if(len(username) > 25):
+            raise ValueError("Username exceeds 25 character limit")
+
         if(len(result) == 0):
             #if the search yields no results, the username is unique
             self.username = username 
-            self.type = type 
-            self.credit = credit 
-            self.status = "online"
+            if((type in ['AA', 'FS', 'BS', 'SS'])):
+                self.type = type 
+                if(credit > 0 and credit < 999999):
+                    self.credit = credit 
 
-            #shorthand symbol for account type, for use of daily transaction file
-            match self.type:
-                case 'admin':
-                    self.typeShort = 'AA'
-                case 'full-standard':
-                    self.typeShort = 'FS'
-                case 'buy-standard':
-                    self.typeShort = 'BS'
-                case 'sell-standard':
-                    self.typeShort = 'SS'
+                    #add the user to the database
+                    user = {"username": self.username, "type": self.type, "credit": self.credit}
+                    collection.insert_one(user) 
 
-            #add the user to the database
-            user = {"username": self.username, "type": self.type, "credit": self.credit, "status": self.status}
-            collection.insert_one(user) 
+                    #add this transaction to the daily transaction file 
+                    transaction = "01" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+                    f = open("daily_transaction_file.txt", "a") 
+                    f.write(transaction) 
 
-            #add this transaction to the daily transaction file 
-            transaction = "01" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
-            f = open("daily_transaction_file.txt", "a") 
-            f.write(transaction) 
-
+                else:
+                    raise ValueError("Value for credit is not valid")
+            else:
+                raise ValueError("User type is invalid") 
         else:
             raise ValueError('Username is not unique')
 
@@ -69,48 +67,29 @@ class User():
         """
         Return User object based on unique username
         """
-        query = {"username": username}
-        result = collection.find(query) 
-
-        return result 
+        query = {"username:", username}
+        result = collection.find_one(query)
+        user = User(result.get('Username'), result.get('type'), result.get('credit'))
         
-    def deleteUser(self):
+        return user
+
+    def getUsername(self):
         """
-        Deletes user from database
+        Return a User instance's username 
         """
+        return self.username
 
-        #delete the user from the database 
-        collection.delete_one({"username": self.username})
-
-        #add this transaction to the daily transaction file 
-        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
-        f = open("daily_transaction_file.txt", "a") 
-        f.write(transaction) 
-
-
-    def addCredit(self, credit):
+    def getCredit(self):
         """
-        Add credit to user's account 
+        Return a User instance's credit 
         """
+        return self.credit
 
-        if(credit > 0):
-            if(self.credit + credit > 999999):
-                #update credit in database
-                self.credit += credit 
-                query = {"username:", self.username}
-                newCredit = { "$set": {
-                    "credit": self.credit + credit
-                }}
-                collection.update_one(query, newCredit)
-
-                #add the transaction to the daily transaction file 
-                transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
-                f = open("daily_transaction_file.txt", "a") 
-                f.write(transaction) 
-            else:
-                raise ValueError("Exceeds credit limit")
-        else:
-            raise ValueError("Value must be greater than zero")
+    def getType(self):
+        """
+        Return a User instance's type
+        """
+        return self.type
 
     def logout(self): 
         """
@@ -132,31 +111,5 @@ class User():
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
 
-    def refund(self, other, credit):
-        """
-        Issue a refund from self (seller) to other (buyer) of amount credit 
-        """
-
-        #Check if other user exists 
-        buyerQuery = {"username:", other.username}
-        if(len(collection.find_one(buyerQuery) == 1) and credit > 0):
-            #Make appropriate changes to each respective users' accounts 
-            if(self.credit + credit > 999999):
-                #Check if transaction will cause seller to exceed maximum credit limit 
-                sellerQuery = {"username:", self.username}
-                sellerCredit = { "$set": {
-                    "credit": self.credit + credit
-                }}
-                buyerCredit = { "$set": {
-                    "credit": self.credit - credit
-                }}
-                collection.update_one(buyerQuery, buyerCredit)
-                collection.update_one(sellerQuery, sellerCredit)
-            else:
-                raise ValueError("Seller is over credit limit")
-        elif(len(collection.find_one(buyerQuery) == 0)):
-            raise ValueError("Buyer does not exist")
-        elif(credit < 0):
-            raise ValueError("Invalid value for credit")
 
 
