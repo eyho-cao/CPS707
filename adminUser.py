@@ -136,8 +136,8 @@ class Admin(User):
         user = self.getUser(username)
         
 
-        if(credit > 0):
-            if(user.getCredit() + credit > 999999):
+        if(credit >= 0):
+            if(user.getCredit() + credit <= 999999):
                 #update credit in database
                 balance = user.getCredit() + credit 
                 query = {"username:", user.getUsername()}
