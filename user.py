@@ -27,7 +27,7 @@ class User():
             self.username = username 
             if((type in ['AA', 'FS', 'BS', 'SS'])):
                 self.type = type 
-                if(credit > 0 and credit < 999999):
+                if(credit >= 0 and credit < 999999):
                     self.credit = credit 
 
                     #add the user to the database
