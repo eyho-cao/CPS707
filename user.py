@@ -79,7 +79,7 @@ class User():
         """
         return self.username
 
-    def getCredit(self):
+    def addCredit(self, credit):
         """
         #delete the user from the database 
         collection.delete_one({"username": self.username})
@@ -91,7 +91,7 @@ class User():
         """
 
 
-    def addCredit(self, credit):
+    def getCredit(self):
         """
         Return a User instance's credit 
         """
@@ -127,4 +127,10 @@ class User():
         raise ValueError("Insufficient Permissions")
 
     def create(self, username, userType):
+        raise ValueError("Insufficient Permissions")
+
+    def sell(self, title, price, numTickets):
+        raise ValueError("Insufficient Permissions")
+
+    def buy(self, title, numTickets, seller):
         raise ValueError("Insufficient Permissions")
