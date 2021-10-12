@@ -128,3 +128,6 @@ class User():
 
     def buy(self, title, numTickets, seller):
         raise ValueError("Insufficient Permissions")
+
+    def deleteUser(username):
+        raise ValueError("Insufficient Permissions")
