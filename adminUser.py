@@ -109,7 +109,7 @@ class Admin(User):
             sellerUser = getUser(seller)
             buyerUser = getUser(buyer)
             #Make appropriate changes to each respective users' accounts 
-            if(buyerUser.getCredit() + credit < 999999):
+            if(buyerUser.getCredit() + credit <= 999999):
                 #Check if transaction will cause seller to exceed maximum credit limit 
                 sellerQuery = {"username:", sellerUser} ##NOTE:COMPARE THIS
                 sellerCredit = { "$set": {
@@ -136,8 +136,8 @@ class Admin(User):
         user = self.getUser(username)
         
 
-        if(credit > 0):
-            if(user.getCredit() + credit > 999999):
+        if(credit >= 0):
+            if(user.getCredit() + credit <= 999999):
                 #update credit in database
                 balance = user.getCredit() + credit 
                 query = {"username:", user.getUsername()}
