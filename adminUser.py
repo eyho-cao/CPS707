@@ -47,7 +47,7 @@ class Admin(User):
                 }}
 
                 eventCollection.update_one(eventQuery, remainingTick)
-                transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(numTickets + ("_" * (3 - len(str(numTickets))))) + "_" + str(titlePrice + ("_" * (6 - len(str(titlePrice)))))
+                transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(str(numTickets) + ("_" * (3 - len(str(numTickets))))) + "_" + str(str(titlePrice) + ("_" * (6 - len(str(titlePrice)))))
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
                 print("Transaction Confirmed")
@@ -67,7 +67,7 @@ class Admin(User):
            raise ValueError("Event cannot have more than 100 tickets")
         #do stuff
         #add to transaction file NOTE: since the event cant sell tickets until after the seller user logs off i think it might be best if we run a routine right before logging out that then adds the event
-        transaction = "03" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(numTickets + ("_" * (3 - len(str(numTickets))))) + "_" + str(titlePrice + ("_" * (6 - len(str(titlePrice)))))
+        transaction = "03" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(str(numTickets) + ("_" * (3 - len(str(numTickets))))) + "_" + str(str(titlePrice) + ("_" * (6 - len(str(titlePrice)))))
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
         print("Event Created - " +"Event Name: " +title +"Ticket Price: " +price +" Number of tickets to be sold: " +numTickets)
@@ -81,7 +81,7 @@ class Admin(User):
         collection.delete_one({"username": username})
 
         #add this transaction to the daily transaction file 
-        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
 
@@ -148,7 +148,7 @@ class Admin(User):
                 collection.update_one(query, newCredit)
 
                 #add the transaction to the daily transaction file 
-                transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+                transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
             else:
