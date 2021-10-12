@@ -1,7 +1,7 @@
 import pymongo
 from adminUser import Admin
 from BuySUser import BSUser
-from SellSUser import SSUSer
+from SellSUser import SSUser
 from fullSUser import FSUser
 
 
