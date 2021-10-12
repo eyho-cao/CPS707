@@ -14,21 +14,23 @@ class Login():
     def login(username):
         query = {"username": username} 
         result = collection.find_one(query)
-        if(len(result) == 1):
+        if(result != None):
             #logged in
             user = getUser(username)
             userType = user.getType()
             if(userType == "AA"):
                 #admin login
-                
+                return 0
             elif(userType == "FS"):
                 #full S login
-
+                return 0
             elif(userType == "BS"):
                 #buy S login
-
+                return 0
             elif(userType == "SS"):
                 #sell S login
-
+                return 0
             else:
                 raise ValueError("Account type not found")
+        else:
+            return 1
