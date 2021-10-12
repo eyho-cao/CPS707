@@ -178,4 +178,14 @@ class Event():
 
         collection.update_one(query, update)
 
+    def getEvent(eventName):
+        """
+        Return Event object based on unique event name
+        """
+        query = {"events:", eventName}
+        result = collection.find_one(query)
+        event = Event(result.get('name'), result.get('quantity'), result.get('price'))
+        
+        return event
+
     
