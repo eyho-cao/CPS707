@@ -19,7 +19,6 @@ class Admin(User):
     def create(self, username, type, credit=0):
         """
         Create a User object 
-
         Default credit value to zero, unless other value is specified 
         """
         try:
@@ -39,7 +38,7 @@ class Admin(User):
         collection.delete_one({"username": username})
 
         #add this transaction to the daily transaction file 
-        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
 
@@ -55,10 +54,8 @@ class Admin(User):
     def refund(self, buyer, seller, credit):
         """
         Issue a refund from seller to buyer of amount credit 
-
         buyer:  buyer username 
         seller: seller username 
-
         NOTE: do not pass through user objects, just their usernames 
         """
 
@@ -104,7 +101,7 @@ class Admin(User):
                 collection.update_one(query, newCredit)
 
                 #add the transaction to the daily transaction file 
-                transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+                transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
             else:
