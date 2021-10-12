@@ -100,6 +100,7 @@ class Event():
                             self.name = name 
                             self.price = price
                             self.quantity = quantity
+                            if("AM" in time.upper() or "PM" in time.upper()): time = formatTime(time)
                             self.dateTime = formatDate(date, time) 
                             self.owner = owner
                             
