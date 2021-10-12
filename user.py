@@ -7,25 +7,22 @@ client = pymongo.MongoClient("mongodb+srv://ADMIN:ukdkXvAUbfYBFezo@cluster0.0eg8
 db = client["cps707"] 
 collection = db["users"]
 
-
 class User():
 
     def __init__(self, username, type, credit=0): 
         """
         Constructor for User object 
-
         Default credit value to zero, unless other value is specified 
         """
 
         #check if the username is unique
         query = {"username": username} 
-        result = collection.find(query) 
-
+        result = collection.find_one(query) 
         #check if usename exceeds character limit 
         if(len(username) > 25):
             raise ValueError("Username exceeds 25 character limit")
 
-        if(len(result) == 0):
+        if(result == None):
             #if the search yields no results, the username is unique
             self.username = username 
             if((type in ['AA', 'FS', 'BS', 'SS'])):
@@ -38,7 +35,7 @@ class User():
                     collection.insert_one(user) 
 
                     #add this transaction to the daily transaction file 
-                    transaction = "01" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+                    transaction = "01" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
                     f = open("daily_transaction_file.txt", "a") 
                     f.write(transaction) 
 
@@ -52,10 +49,8 @@ class User():
     def __str__(self):
         """
         string formatting for instances of User object
-
         u = User('trinh','admin')
         print(u)
-
         >>> User(username='trinh', type='admin', credit=0)
         """
         return f'User(username={self.username}, type={self.type}, credit{self.credit}'
@@ -83,9 +78,8 @@ class User():
         """
         #delete the user from the database 
         collection.delete_one({"username": self.username})
-
         #add this transaction to the daily transaction file 
-        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
         """
@@ -119,7 +113,7 @@ class User():
             raise ValueError('User status error')
         
         #add the transaction to the daily transaction file 
-        transaction = '02' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.typeShort + "_" + str(self.credit + ("_" * (9 - len(str(self.credit)))))
+        transaction = '02' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
 
