@@ -1,4 +1,5 @@
-import user
+from user import User
+import pymongo 
 
 class BSUser(User):
     """
@@ -17,27 +18,28 @@ class BSUser(User):
     decrease num ticket if user buys
     """
     def buy(self, title, numTickets, sellName):
-        #check if sellname exists
-        #insert db check for sell name
-        validSN = True
-        validTitle = True
-        titlePrice = 19.99
-        if(not validSN):
-            raise ValueError("Invalid Seller");
-        if(not validTitle):
-            raise ValueError("Invalid Title");
-        if(numTickets > 4):
-            raise ValueError("Number of tickets bought cannot exceed 4")
-        remainingTick = 999-numTickets #999 needs to be replaced with remaining tickets from db
+        sellerQuery = {"username:", sellName}
+        eventQuery = {"events", title}
+        if(not len(collection.find_one(sellerQuery) == 1)):
+            print("Invalid Seller");
+        eventQResult = eventCollection.find_one(eventQuery)
+        if(not len(eventQResult == 1)):
+            print("Invalid Title");
+        remainingTick = eventQResult.get('quantity')-numTickets #get number of tickets left in event
+        titlePrice = eventQResult.get('price')
         if(remainingTick >=0):
             print("Price per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
             userInput = input("Confirm Transaction Y/N")
-            #python has no switch case? switch case not implemented until 3.10
             if(userInput == "Y" or userInput == "yes" or userInput == "Yes"):
-                #confirm transaction - decrease number of tickets from db - add to transaction line
+                ticketsLeft = { "$set": {
+                    "quantity": remainingTick
+                }}
+
+                eventCollection.update_one(eventQuery, remainingTick)
                 transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(numTickets + ("_" * (3 - len(str(numTickets))))) + "_" + str(titlePrice + ("_" * (6 - len(str(titlePrice)))))
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
                 print("Transaction Confirmed")
+                doStuff = 0
             else:
                 print("Transaction Cancelled")
