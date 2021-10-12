@@ -1,4 +1,5 @@
 from user import User
+from event import Event 
 import pymongo 
 
 
@@ -31,12 +32,12 @@ class Admin(User):
         sellerQuery = {"username:", sellName}
         eventQuery = {"events", title}
         if(not len(collection.find_one(sellerQuery) == 1)):
-            print("Invalid Seller");
-        eventQResult = eventCollection.find_one(eventQuery)
-        if(not len(eventQResult == 1)):
-            print("Invalid Title");
-        remainingTick = eventQResult.get('quantity')-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
-        titlePrice = eventQResult.get('price')
+            raise ValueError("Invalid Seller")
+        event = getEvent(title)
+        if(None):
+            raise ValueError("Invalid Title")
+        remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
+        titlePrice = event.price('price')
         if(remainingTick >=0):
             print("Price per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
             userInput = input("Confirm Transaction Y/N")

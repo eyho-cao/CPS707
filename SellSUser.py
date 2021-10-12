@@ -1,5 +1,13 @@
 from user import User
+from event import Event
+
 import pymongo
+
+
+client = pymongo.MongoClient("mongodb+srv://ADMIN:ukdkXvAUbfYBFezo@cluster0.0eg8l.mongodb.net/cps707?ssl=true&ssl_cert_reqs=CERT_NONE")
+db = client["cps707"] 
+collection = db["users"]
+eventCollection = db["events"]
 
 class SSUser(User):
     def sell(self, title, numTickets, price):
@@ -8,7 +16,7 @@ class SSUser(User):
         if(len(title) > 25):
             raise ValueError("Event Title cannot exceed 25 characters")
         eventQuery ={"events", title}
-        if(not len(collection.find_one(eventQuery) == 1)):
+        if(not len(eventCollection.find_one(eventQuery) == 1)):
             raise ValueError("Event name already used")
         if(numTickets > 100):
            raise ValueError("Event cannot have more than 100 tickets")
