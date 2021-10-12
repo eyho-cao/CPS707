@@ -53,10 +53,10 @@ class User():
         print(u)
         >>> User(username='trinh', type='admin', credit=0)
         """
-        return f'User(username={self.username}, type={self.type}, credit{self.credit}'
+        return f'User(username={self.username}, type={self.type}, credit={self.credit})'
 
     def __repr__(self):
-        return f'User(username={self.username}, type={self.type}, credit{self.credit}'
+        return f'User(username={self.username}, type={self.type}, credit={self.credit})'
 
     def getUser(username):
         """
@@ -64,7 +64,7 @@ class User():
         """
         query = {"username:", username}
         result = collection.find_one(query)
-        user = User(result.get('Username'), result.get('type'), result.get('credit'))
+        user = User(result.get('username'), result.get('type'), result.get('credit'))
         
         return user
 
