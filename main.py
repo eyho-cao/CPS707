@@ -15,14 +15,12 @@ def main():
     loggedIn = False
     # wait for user to attempt to login
     while (command != "login"):
-        print("1")
         command = input()
         if (command == "login"):
             break
     
     # check to see if user is logging in with a valid username
     while (not loggedIn):
-        print("2")
         username = input("Username: ")
         Login.login(username)
         if (Login.login(username) == 0):
@@ -30,7 +28,6 @@ def main():
             break
     # user can attempt transactions or logout
     while (command != "logout"):
-        print("3")
         command = input("")
         if (command == "logout"):
             break
