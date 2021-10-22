@@ -104,7 +104,6 @@ class Event():
                             self.dateTime = formatDate(date, time) 
                             self.owner = owner
                             
-
                             #add the user to the database
                             event = {
                                 "name": self.name,
@@ -117,6 +116,7 @@ class Event():
                             collection.insert_one(event)
 
                             #add this transaction to an output file... 
+                            #TODO
                         else:
                             raise ValueError("The owner does not exist")
                     else:
