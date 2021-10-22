@@ -16,15 +16,43 @@ class Admin(User):
         pass 
 
 
-    def create(self, username, type, credit=0):
+    def createUser(self, username, type, credit=0):
         """
         Create a User object 
         Default credit value to zero, unless other value is specified 
         """
-        try:
-            user = User(username, type, credit)
-        except ValueError:
-            print("Value error")
+        if(len(username) > 25):
+            raise ValueError("Username exceeds 25 character limit")
+
+        query = {"username": username} 
+        result = collection.find_one(query) 
+
+        if(result == None):
+            #Check if username is unique 
+            if((type in ['AA', 'FS', 'BS', 'SS'])):
+                #Check if type is valid
+                if(credit >= 0 and credit < 999999):
+                    #Check if credit is valid
+
+                    #add the user to the database
+                    user = {"username": username, "type": type, "credit": credit}
+                    collection.insert_one(user) 
+                    
+                    #TODOOOOO
+                    """
+                    #add this transaction to the daily transaction file 
+                    transaction = "01" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
+                    f = open("daily_transaction_file.txt", "a") 
+                    f.write(transaction) 
+                    """
+
+                else:
+                    raise ValueError("Value for credit is not valid")
+            else:
+                raise ValueError("User type is invalid") 
+        else:
+            raise ValueError('Username is not unique')
+
 
     def buy(self, title, numTickets, sellName):
         return 0
