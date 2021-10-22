@@ -24,6 +24,8 @@ class User():
             self.username = username
             self.type = result.get('type')
             self.credit = result.get('credit')
+        else:
+            raise ValueError("User does not exist")
 
     def __str__(self):
         """
