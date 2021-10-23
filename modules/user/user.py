@@ -20,7 +20,7 @@ class User():
         result = collection.find_one(query) 
         #check if usename exceeds character limit 
         
-        if(len(result) == 1):
+        if(result != None):
             self.username = username
             self.type = result.get('type')
             self.credit = result.get('credit')
@@ -45,7 +45,7 @@ class User():
         """
         query = {"username": username}
         result = collection.find_one(query)
-        user = User(result.get('username'), result.get('type'), result.get('credit'))
+        user = User(result.get('username'))
         
         return user
 
