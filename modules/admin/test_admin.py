@@ -64,5 +64,9 @@ class TestAdmin(unittest.TestCase):
             "AA"
         )
 
+    def test_create_valid_admin(self):
+        adminUser= "adminTest"
+        self.createUser(adminUser, admin)
+        self.assertEqual()
 if __name__ == '__main__':
     unittest.main()

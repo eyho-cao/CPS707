@@ -39,12 +39,12 @@ class Admin(User):
                     collection.insert_one(user) 
                     
                     #TODOOOOO
-                    """
+                    
                     #add this transaction to the daily transaction file 
                     transaction = "01" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
                     f = open("daily_transaction_file.txt", "a") 
                     f.write(transaction) 
-                    """
+                    
 
                 else:
                     raise ValueError("Value for credit is not valid")
