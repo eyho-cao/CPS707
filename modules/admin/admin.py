@@ -115,7 +115,7 @@ class Admin(User):
                 }}
 
                 eventCollection.update_one(eventQuery, remainingTick)
-                transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(str(numTickets) + ("_" * (3 - len(str(numTickets))))) + "_" + str(str(titlePrice) + ("_" * (6 - len(str(titlePrice)))))
+                transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + str(title + ("_" * (19 - len(title)))) + "_" + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + "_" + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice))
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
                 print("Transaction Confirmed")
@@ -135,10 +135,9 @@ class Admin(User):
            raise ValueError("Event cannot have more than 100 tickets")
         #do stuff
         #add to transaction file NOTE: since the event cant sell tickets until after the seller user logs off i think it might be best if we run a routine right before logging out that then adds the event
-        transaction = "03" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(str(numTickets) + ("_" * (3 - len(str(numTickets))))) + "_" + str(str(titlePrice) + ("_" * (6 - len(str(titlePrice)))))
+        transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + str(title + ("_" * (19 - len(title)))) + "_" + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + "_" + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice))
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
-        print("Event Created - " +"Event Name: " +title +"Ticket Price: " +price +" Number of tickets to be sold: " +numTickets)
         print("Event Created - " +"Event Name: " +title +"Ticket Price: " +price +" Number of tickets to be sold: " +numTickets)
 
     def deleteUser(username):
