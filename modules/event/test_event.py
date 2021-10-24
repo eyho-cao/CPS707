@@ -1,6 +1,8 @@
 import unittest 
 import datetime
 import pymongo
+import sys
+sys.path.insert(1,'../')
 from event import Event
 
 client = pymongo.MongoClient("mongodb+srv://ADMIN:ukdkXvAUbfYBFezo@cluster0.0eg8l.mongodb.net/cps707?ssl=true&ssl_cert_reqs=CERT_NONE")

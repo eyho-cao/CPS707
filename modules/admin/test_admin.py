@@ -1,5 +1,7 @@
 import unittest 
 import pymongo
+import sys
+sys.path.insert(1, '../')
 from admin import Admin
 
 client = pymongo.MongoClient("mongodb+srv://ADMIN:ukdkXvAUbfYBFezo@cluster0.0eg8l.mongodb.net/cps707?ssl=true&ssl_cert_reqs=CERT_NONE")
@@ -8,13 +10,14 @@ collection = db["users"]
 
 
 class TestAdmin(unittest.TestCase):
+    obj = Admin()
 
     def setUp(self):
         """
         setUp(self) is a function that runs before every test case, 
         in this case I wanted to make a new user everytime 
         """
-        self.user = User("oldboy")
+        self.user = obj.User("oldboy")
     
     def tearDown(self):
         """
@@ -67,6 +70,6 @@ class TestAdmin(unittest.TestCase):
     def test_create_valid_admin(self):
         adminUser= "adminTest"
         self.createUser(adminUser, admin)
-        self.assertEqual()
+        self.assertEqual(true, true)
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,7 @@
+import sys
+import pymongo
+sys.path.insert(1,'../CPS707/modules/user/')
 from user import User
-import pymongo 
 
 
 

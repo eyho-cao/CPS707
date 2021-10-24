@@ -1,5 +1,5 @@
 import pymongo
-from adminUser import Admin
+from admin import Admin
 from BuySUser import BSUser
 from SellSUser import SSUser
 from fullSUser import FSUser
@@ -14,21 +14,26 @@ class Login():
     def login(username):
         query = {"username": username} 
         result = collection.find_one(query)
+        userObj
         if(result != None):
             #logged in
             user = getUser(username)
             userType = user.getType()
             if(userType == "AA"):
                 #admin login
+                userObj = Admin()
                 return 0
             elif(userType == "FS"):
                 #full S login
+                userObj = FSUser(user)
                 return 0
             elif(userType == "BS"):
                 #buy S login
+                userObj = BSUser(user)
                 return 0
             elif(userType == "SS"):
                 #sell S login
+                userObj = SSUser(User)
                 return 0
             else:
                 raise ValueError("Account type not found")
