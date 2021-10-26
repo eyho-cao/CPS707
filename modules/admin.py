@@ -14,6 +14,10 @@ collection = db["users"]
 
 class Admin(User):
 
+    def __init__(self):
+        pass 
+
+
     def createUser(self, username, type, credit=0):
         """
         Create a User object 
@@ -39,10 +43,9 @@ class Admin(User):
                     #TODOOOOO
                     
                     #add this transaction to the daily transaction file 
-                    transaction = "01 " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
+                    transaction = "01" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
                     f = open("daily_transaction_file.txt", "a") 
-                    f.write(transaction)
-                    f.close()
+                    f.write(transaction) 
                     
 
                 else:
@@ -114,10 +117,9 @@ class Admin(User):
                 }}
 
                 eventCollection.update_one(eventQuery, remainingTick)
-                transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
+                transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + str(title + ("_" * (19 - len(title)))) + "_" + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + "_" + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice))
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
-                f.close()
                 print("Transaction Confirmed")
                 doStuff = 0
             else:
@@ -135,29 +137,23 @@ class Admin(User):
            raise ValueError("Event cannot have more than 100 tickets")
         #do stuff
         #add to transaction file NOTE: since the event cant sell tickets until after the seller user logs off i think it might be best if we run a routine right before logging out that then adds the event
-        transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
+        transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + str(title + ("_" * (19 - len(title)))) + "_" + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + "_" + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice))
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
-        f.close()
         print("Event Created - " +"Event Name: " +title +"Ticket Price: " +price +" Number of tickets to be sold: " +numTickets)
 
-    def deleteUser(self, username):
+    def deleteUser(username):
         """
         Deletes user from database
         """
-        if(username == User.getUsername()):
-            raise ValueError("Cannot delete, logged in as user")
-        elif(getUser(username)):
-            #delete the user from the database 
-            collection.delete_one({"username": username})
 
-            #add this transaction to the daily transaction file 
-            transaction = "02 " + str(self.username) + " " + self.type + " " + str(str(self.credit)) +"\n"
-            f = open("daily_transaction_file.txt", "a") 
-            f.write(transaction)
-            f.close()
-        else:
-            raise ValueError("User not found")
+        #delete the user from the database 
+        collection.delete_one({"username": username})
+
+        #add this transaction to the daily transaction file 
+        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
+        f = open("daily_transaction_file.txt", "a") 
+        f.write(transaction) 
 
     def deleteTicket(ticket):
         """
@@ -205,10 +201,9 @@ class Admin(User):
         """
 
         user = self.getUser(username)
+        
 
         if(credit >= 0):
-            if(credit > 1000):
-                raise ValueError("Value muse not be more than $1000")
             if(user.getCredit() + credit <= 999999):
                 #update credit in database
                 balance = user.getCredit() + credit 
@@ -219,10 +214,9 @@ class Admin(User):
                 collection.update_one(query, newCredit)
 
                 #add the transaction to the daily transaction file 
-                transaction = '06 ' + " " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
+                transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
                 f = open("daily_transaction_file.txt", "a") 
-                f.write(transaction)
-                f.close()
+                f.write(transaction) 
             else:
                 raise ValueError("Exceeds credit limit")
         else:

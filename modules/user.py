@@ -45,11 +45,9 @@ class User():
         """
         query = {"username": username}
         result = collection.find_one(query)
-        if(result is not None):
-            user = User(result.get('username'))
-            return user
-        else:
-            raise ValueError("Username Not Found")
+        user = User(result.get('username'))
+        
+        return user
 
     def getUsername(self):
         """
@@ -85,8 +83,7 @@ class User():
         Logout of current session
         """
 
-        #Set user's status to offline in db
-        """
+        #Set user's status to offline in db 
         if(self.status == "online"):
             query = {"username:", self.username}
             newCredit = { "$set": {
@@ -95,12 +92,11 @@ class User():
             collection.update_one(query, newCredit)
         else:
             raise ValueError('User status error')
-        """
+        
         #add the transaction to the daily transaction file 
-        transaction = '00' + " " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
+        transaction = '02' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
-        f.close()
 
     def refund(self, seller, buyer, credit):
         raise ValueError("Insufficient Permissions")
@@ -115,7 +111,4 @@ class User():
         raise ValueError("Insufficient Permissions")
 
     def deleteUser(username):
-        raise ValueError("Insufficient Permissions")
-
-    def createUser(username, type, credit):
         raise ValueError("Insufficient Permissions")

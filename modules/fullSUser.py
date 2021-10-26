@@ -47,7 +47,7 @@ class FSUser(User):
                     }}
 
                     eventCollection.update_one(eventQuery, remainingTick)
-                    transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(str(numTickets) + ("_" * (3 - len(str(numTickets))))) + "_" + str(str(titlePrice) + ("_" * (6 - len(str(titlePrice)))))+"\n"
+                    transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(str(numTickets) + ("_" * (3 - len(str(numTickets))))) + "_" + str(str(titlePrice) + ("_" * (6 - len(str(titlePrice)))))
                     f = open("daily_transaction_file.txt", "a") 
                     f.write(transaction) 
                     print("Transaction Confirmed")
