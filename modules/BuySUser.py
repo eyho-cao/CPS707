@@ -36,9 +36,9 @@ class BSUser(User):
         titlePrice = event.price('price')
         if(numTickets < 4):
             if(remainingTick >=0):
-                print("Price per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
-                userInput = input("Confirm Transaction Y/N")
-                if(userInput == "Y" or userInput == "yes" or userInput == "Yes"):
+                print("\nPrice per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
+                userInput = input("Confirm Transaction Y/N\n")
+                if(userInput == "Y" or userInput == "yes" or userInput == "Yes" or userInput == "y"):
                     ticketsLeft = { "$set": {
                         "quantity": remainingTick
                     }}

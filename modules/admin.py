@@ -11,7 +11,7 @@ from event import Event
 client = pymongo.MongoClient("mongodb+srv://ADMIN:ukdkXvAUbfYBFezo@cluster0.0eg8l.mongodb.net/cps707?ssl=true&ssl_cert_reqs=CERT_NONE")
 db = client["cps707"] 
 collection = db["users"]
-
+eventCollection = db["events"]
 
 class Admin(User):
 
@@ -111,8 +111,8 @@ class Admin(User):
         remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
         titlePrice = event.price('price')
         if(remainingTick >=0):
-            print("Price per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
-            userInput = input("Confirm Transaction Y/N")
+            print("\nPrice per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
+            userInput = input("Confirm Transaction Y/N\n")
             if(userInput == "Y" or userInput == "yes" or userInput == "Yes"):
                 ticketsLeft = { "$set": {
                     "quantity": remainingTick
@@ -145,12 +145,12 @@ class Admin(User):
         if(remainingTick >=0):
             print("Price per Ticket: " +str(titlePrice) +"\nTotal Price: " +str(titlePrice*numTickets))
             userInput = input("Confirm Transaction Y/N")
-            if(userInput == "Y" or userInput == "yes" or userInput == "Yes"):
+            if(userInput == "Y" or userInput == "yes" or userInput == "Yes" or userInput == "y"):
                 ticketsLeft = { "$set": {
                     "quantity": remainingTick
                 }}
 
-                eventCollection.update_one(eventQuery, remainingTick)
+                eventCollection.update_one(eventQuery, ticketsLeft)
                 transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
@@ -252,6 +252,10 @@ class Admin(User):
                     }}
                     collection.update_one(buyerQuery, buyerCredit)
                     collection.update_one(sellerQuery, sellerCredit)
+                    transaction = '05' + " " + buyer + " " + seller + " " + str(credit)+"\n"
+                    f = open("daily_transaction_file.txt", "a")
+                    f.write(transaction)
+                    f.close()
                 else:
                     raise ValueError("Seller is over credit limit")
             else:
@@ -285,7 +289,7 @@ class Admin(User):
                 collection.update_one(query, newCredit)
 
                 #add the transaction to the daily transaction file 
-                transaction = '06 ' + " " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
+                transaction = '06' + " " + str(user.getUsername()) + " " + user.getType() + " " + str(str(self.credit+credit))+"\n"
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
                 f.close()

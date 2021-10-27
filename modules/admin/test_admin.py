@@ -70,6 +70,12 @@ class TestAdmin(unittest.TestCase):
             "AA"
         )
 
+    def test_addcredit_admin_valid(self):
+        self.user.addCredit("billy", 20)
+        self.user.logout()
+        testf = "C:/Users/Eyho Cao/Documents/GitHub/CPS707/modules/admin/daily_transaction_file.txt"
+        expectedf = "../ExpectedOutput/addcredit_admin_valid.txt"
+        self.assertTrue(filecmp.cmp(testf, expectedf))
     def test_create_valid_admin(self):
         adminUser= "adminTest"
         self.user.createUser(adminUser, "AA")
@@ -78,6 +84,13 @@ class TestAdmin(unittest.TestCase):
         expectedf = "../ExpectedOutput/create_valid_admin.txt"
         self.assertTrue(filecmp.cmp(testf, expectedf))
 
+    def test_create_username_taken(self):
+        fsUser = "billy4"
+        try:
+            self.user.createUser(fsUser, "FS")
+        except ValueError as e:
+            self.assertEqual(type(e), ValueError)
+
     def test_create_valid_full_standard(self):
         fsUser= "FSTest"
         self.user.createUser(fsUser, "FS")
@@ -85,13 +98,6 @@ class TestAdmin(unittest.TestCase):
         testf = "C:/Users/Eyho Cao/Documents/GitHub/CPS707/modules/admin/daily_transaction_file.txt"
         expectedf = "../ExpectedOutput/create_valid_full_standard.txt"
         self.assertTrue(filecmp.cmp(testf, expectedf))
-
-    def test_create_username_taken(self):
-        fsUser = "FSTest"
-        try:
-            self.user.createUser(fsUser, "FS")
-        except ValueError as e:
-            self.assertEqual(type(e), ValueError)
 
     def test_create_username_long(self):
         fsUser = "thisusernameistoolongtouse"
