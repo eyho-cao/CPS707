@@ -25,9 +25,9 @@ class BSUser(User):
     decrease num ticket if user buys
     """
     def buy(self, title, numTickets, sellName):
-        sellerQuery = {"username:", sellName}
-        eventQuery = {"events", title}
-        if(not len(collection.find_one(sellerQuery) == 1)):
+        sellerQuery = {"username:": sellName}
+        eventQuery = {"events": title}
+        if(not (len(collection.find_one(sellerQuery)) == 1)):
             raise ValueError("Invalid Seller");
         event = getEvent(title)
         if(None):
@@ -44,7 +44,7 @@ class BSUser(User):
                     }}
 
                     eventCollection.update_one(eventQuery, remainingTick)
-                    transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + title + "_" + str(str(numTickets) + ("_" * (3 - len(str(numTickets))))) + "_" + str(str(titlePrice) + ("_" * (6 - len(str(titlePrice)))))
+                    transaction = "04" + str(self.username + (" " * (15 - len(self.username)))) + " " + title + " " + str(str(numTickets) + (" " * (3 - len(str(numTickets))))) + " " + str(str(titlePrice) + (" " * (6 - len(str(titlePrice)))))+"\n"
 
                     f = open("daily_transaction_file.txt", "a") 
                     f.write(transaction) 

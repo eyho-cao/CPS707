@@ -2,6 +2,7 @@ import sys
 import pymongo
 sys.path.insert(1,'../CPS707/modules/user/')
 from user import User
+from event import Event
 
 
 
@@ -14,8 +15,8 @@ collection = db["users"]
 
 class Admin(User):
 
-    def __init__(self):
-        pass 
+    #def __init__(self):
+     #   pass 
 
 
     def createUser(self, username, type, credit=0):
@@ -43,9 +44,10 @@ class Admin(User):
                     #TODOOOOO
                     
                     #add this transaction to the daily transaction file 
-                    transaction = "01" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
+                    transaction = "01 " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
                     f = open("daily_transaction_file.txt", "a") 
                     f.write(transaction) 
+                    f.close()
                     
 
                 else:
@@ -99,9 +101,9 @@ class Admin(User):
 
 
     def buy(self, title, numTickets, sellName):
-        sellerQuery = {"username:", sellName}
-        eventQuery = {"events", title}
-        if(not len(collection.find_one(sellerQuery) == 1)):
+        sellerQuery = {"username:": sellName}
+        eventQuery = {"events": title}
+        if(not (len(collection.find_one(sellerQuery)) == 1)):
             raise ValueError("Invalid Seller")
         event = getEvent(title)
         if(None):
@@ -117,11 +119,43 @@ class Admin(User):
                 }}
 
                 eventCollection.update_one(eventQuery, remainingTick)
-                transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + str(title + ("_" * (19 - len(title)))) + "_" + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + "_" + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice))
+                transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
+                f.close()
                 print("Transaction Confirmed")
-                doStuff = 0
+            else:
+                print("Transaction Cancelled")
+
+                #proposed changes to buy method - Eyho
+    def buy1(self, title, numTickets, sellName):
+        sellerQuery = {"username:": sellName}
+        eventQuery = {"events": title}
+        sellObj = User.getUser(self, sellName)
+        if(sellObj is None):
+            raise ValueError("Invalid Seller")
+
+        event = Event(title)
+
+        if(event is None):
+            raise ValueError("Invalid Title")
+
+        remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
+        titlePrice = event.getPrice()
+        if(remainingTick >=0):
+            print("Price per Ticket: " +str(titlePrice) +"\nTotal Price: " +str(titlePrice*numTickets))
+            userInput = input("Confirm Transaction Y/N")
+            if(userInput == "Y" or userInput == "yes" or userInput == "Yes"):
+                ticketsLeft = { "$set": {
+                    "quantity": remainingTick
+                }}
+
+                eventCollection.update_one(eventQuery, remainingTick)
+                transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
+                f = open("daily_transaction_file.txt", "a") 
+                f.write(transaction) 
+                f.close()
+                print("Transaction Confirmed")
             else:
                 print("Transaction Cancelled")
 
@@ -131,29 +165,35 @@ class Admin(User):
         if(len(title) > 25):
             raise ValueError("Event Title cannot exceed 25 characters")
         eventQuery ={"events", title}
-        if(not len(collection.find_one(eventQuery) == 1)):
+        if(not (len(collection.find_one(eventQuery)) == 1)):
             raise ValueError("Event name already used")
         if(numTickets > 100):
            raise ValueError("Event cannot have more than 100 tickets")
         #do stuff
         #add to transaction file NOTE: since the event cant sell tickets until after the seller user logs off i think it might be best if we run a routine right before logging out that then adds the event
-        transaction = "04" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + str(title + ("_" * (19 - len(title)))) + "_" + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + "_" + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice))
+        transaction = "03 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
         f = open("daily_transaction_file.txt", "a") 
-        f.write(transaction) 
+        f.write(transaction)
+        f.close()
         print("Event Created - " +"Event Name: " +title +"Ticket Price: " +price +" Number of tickets to be sold: " +numTickets)
 
-    def deleteUser(username):
+    def deleteUser(self,username):
         """
         Deletes user from database
         """
+        if(username == self.getUsername()):
+            raise ValueError("Cannot delete, logged in as user")
+        elif(User.getUser(self, username)):
+            #delete the user from the database 
+            collection.delete_one({"username": username})
 
-        #delete the user from the database 
-        collection.delete_one({"username": username})
-
-        #add this transaction to the daily transaction file 
-        transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
-        f = open("daily_transaction_file.txt", "a") 
-        f.write(transaction) 
+            #add this transaction to the daily transaction file 
+            transaction = "02 " + str(self.username) + " " + self.type + " " + str(str(self.credit)) +"\n"
+            f = open("daily_transaction_file.txt", "a") 
+            f.write(transaction)
+            f.close()
+        else:
+            raise ValueError("User not found")
 
     def deleteTicket(ticket):
         """
@@ -163,7 +203,6 @@ class Admin(User):
 
     def refund(self, buyName, sellName, amount):
         return 0
-
     def refund(self, buyer, seller, credit):
         """
         Issue a refund from seller to buyer of amount credit 
@@ -173,12 +212,12 @@ class Admin(User):
         """
 
         #Check if buyer exists 
-        buyerQuery = {"username:", buyer}
-        if(len(collection.find_one(buyerQuery) == 1) and credit > 0):
+        buyerQuery = {"username:": buyer}
+        if((len(collection.find_one(buyerQuery)) == 1) and credit > 0):
             #Make appropriate changes to each respective users' accounts 
             if(self.credit + credit < 999999):
                 #Check if transaction will cause seller to exceed maximum credit limit 
-                sellerQuery = {"username:", self.username}
+                sellerQuery = {"username:": self.username}
                 sellerCredit = { "$set": {
                     "credit": self.credit + credit
                 }}
@@ -193,30 +232,63 @@ class Admin(User):
             raise ValueError("Buyer does not exist")
         elif(credit < 0):
             raise ValueError("Invalid value for credit")
+        #my proposed refund method - Eyho
 
 
+    def refund1(self, buyer, seller, credit):
+        buyerObj = Admin.getUser(self,buyer)
+        sellerObj = Admin.getUser(self,seller)
+        if(buyerObj is not None and sellerObj is not None and credit > 0):
+            if(sellerObj.getCredit() - credit >= 0):
+                if(buyerObj.getCredit() + credit < 999999):
+                    #Check if transaction will cause seller to exceed maximum credit limit 
+                    buyerQuery = {"username:": buyer}
+                    sellerQuery = {"username:": self.username}
+                    sellerCredit = { "$set": {
+                        "credit": sellerObj.getCredit() - credit
+                    }}
+                    buyerCredit = { "$set": {
+                        "credit": buyerObj.getCredit() + credit
+                    }}
+                    collection.update_one(buyerQuery, buyerCredit)
+                    collection.update_one(sellerQuery, sellerCredit)
+                else:
+                    raise ValueError("Seller is over credit limit")
+            else:
+                raise ValueError("Seller does not have sufficient funds")
+        elif(buyerObj is None):
+            raise ValueError("Buyer does not exist")
+        elif(sellerObj is None):
+            raise ValueError("Seller does not exist")
+        elif(credit < 0):
+            raise ValueError("Invalid value for credit")
+
+
+       
     def addCredit(self, username, credit):
         """
         Add credit to user's account 
         """
 
         user = self.getUser(username)
-        
+        if(user is None):
+            raise ValueError("Username Not Found")
 
         if(credit >= 0):
             if(user.getCredit() + credit <= 999999):
                 #update credit in database
                 balance = user.getCredit() + credit 
-                query = {"username:", user.getUsername()}
+                query = {"username:": user.getUsername()}
                 newCredit = { "$set": {
                     "credit": balance
                 }}
                 collection.update_one(query, newCredit)
 
                 #add the transaction to the daily transaction file 
-                transaction = '06' + "_" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
+                transaction = '06 ' + " " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
+                f.close()
             else:
                 raise ValueError("Exceeds credit limit")
         else:
