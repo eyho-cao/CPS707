@@ -106,7 +106,7 @@ class User():
     def refund(self, seller, buyer, credit):
         raise ValueError("Insufficient Permissions")
 
-    def createUser(self, username, userType):
+    def createUser(self, username, userType, credit=0):
         raise ValueError("Insufficient Permissions")
 
     def sell(self, title, price, numTickets):

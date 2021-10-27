@@ -134,6 +134,7 @@ class TestAdmin(unittest.TestCase):
     def test_buy_admin_ticket_count_exceeded(self):
         try:
             self.user.buy1("The Rumble in the Jungle", 5, "trinh")
+
         except ValueError as e:
             self.assertEqual(type(e), ValueError)
 
