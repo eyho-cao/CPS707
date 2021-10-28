@@ -108,37 +108,7 @@ class Admin(User):
         else:
             raise ValueError("An event of the same name already exists")
 
-
-
     def buy(self, title, numTickets, sellName):
-        sellerQuery = {"username:": sellName}
-        eventQuery = {"events": title}
-        if(not (len(collection.find_one(sellerQuery)) == 1)):
-            raise ValueError("Invalid Seller")
-        event = getEvent(title)
-        if(None):
-            raise ValueError("Invalid Title")
-        remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
-        titlePrice = event.price('price')
-        if(remainingTick >=0):
-            print("\nPrice per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
-            userInput = input("Confirm Transaction Y/N\n")
-            if(userInput == "Y" or userInput == "yes" or userInput == "Yes"):
-                ticketsLeft = { "$set": {
-                    "quantity": remainingTick
-                }}
-
-                eventCollection.update_one(eventQuery, remainingTick)
-                transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
-                f = open("daily_transaction_file.txt", "a") 
-                f.write(transaction) 
-                f.close()
-                print("Transaction Confirmed")
-            else:
-                print("Transaction Cancelled")
-
-                #proposed changes to buy method - Eyho
-    def buy1(self, title, numTickets, sellName):
         sellerQuery = {"username:": sellName}
         eventQuery = {"events": title}
         sellObj = User.getUser(self, sellName)
@@ -209,43 +179,9 @@ class Admin(User):
         """
         Delete a ticket from the DB 
         """
-        pass 
+        pass
 
-    def refund(self, buyName, sellName, amount):
-        return 0
     def refund(self, buyer, seller, credit):
-        """
-        Issue a refund from seller to buyer of amount credit 
-        buyer:  buyer username 
-        seller: seller username 
-        NOTE: do not pass through user objects, just their usernames 
-        """
-
-        #Check if buyer exists 
-        buyerQuery = {"username:": buyer}
-        if((len(collection.find_one(buyerQuery)) == 1) and credit > 0):
-            #Make appropriate changes to each respective users' accounts 
-            if(self.credit + credit < 999999):
-                #Check if transaction will cause seller to exceed maximum credit limit 
-                sellerQuery = {"username:": self.username}
-                sellerCredit = { "$set": {
-                    "credit": self.credit + credit
-                }}
-                buyerCredit = { "$set": {
-                    "credit": self.credit - credit
-                }}
-                collection.update_one(buyerQuery, buyerCredit)
-                collection.update_one(sellerQuery, sellerCredit)
-            else:
-                raise ValueError("Seller is over credit limit")
-        elif(len(collection.find_one(buyerQuery) == 0)):
-            raise ValueError("Buyer does not exist")
-        elif(credit < 0):
-            raise ValueError("Invalid value for credit")
-        #my proposed refund method - Eyho
-
-
-    def refund1(self, buyer, seller, credit):
         buyerObj = Admin.getUser(self,buyer)
         sellerObj = Admin.getUser(self,seller)
         if(buyerObj is not None and sellerObj is not None and credit > 0):
