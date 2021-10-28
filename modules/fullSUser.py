@@ -12,14 +12,14 @@ class FSUser(User):
     def sell(self, title, numTickets, price):
         eventObj = Event.getEvent(title)
         if(eventObj != None):
-            raise ValueError("Event name already used!")
+            raise ValueError("ERROR: FSUser sell: Event name already used!")
         if(price > 999.99):
-            raise ValueError("Sell Price cannot exceed $999.99")
+            raise ValueError("ERROR: FSUser sell: Sell Price cannot exceed $999.99")
         if(len(title) > 25):
-            raise ValueError("Event Title cannot exceed 25 characters")
+            raise ValueError("ERROR: FSUser sell: Event Title cannot exceed 25 characters")
         
         if(numTickets > 100):
-           raise ValueError("Event cannot have more than 100 tickets")
+           raise ValueError("ERROR: FSUser sell: Event cannot have more than 100 tickets")
 
         #format of vars for list: [title, numtickets, price]
         #self.appendEvent([title, numTickets, price])
@@ -35,12 +35,12 @@ class FSUser(User):
         eventQuery = {"events": title}
         sellObj = User.getUser(self, sellName)
         if(sellObj is None):
-            raise ValueError("Invalid Seller")
+            raise ValueError("ERROR: FSUser buy: Invalid Seller")
 
         event = Event(title)
 
         if(event is None):
-            raise ValueError("Invalid Title")
+            raise ValueError("ERROR: FSUser buy: Invalid Title")
 
         if(numTickets < 4):
             remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
@@ -62,4 +62,4 @@ class FSUser(User):
                 else:
                     print("Transaction Cancelled")
         else:
-            raise ValueError("Cannot buy more than 4 tickets at a time")
+            raise ValueError("ERROR: FSUser buy: Cannot buy more than 4 tickets at a time")

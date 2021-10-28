@@ -29,12 +29,12 @@ class BSUser(User):
         eventQuery = {"events": title}
         sellObj = User.getUser(self, sellName)
         if(sellObj is None):
-            raise ValueError("Invalid Seller")
+            raise ValueError("ERROR: BSUser buy: Invalid Seller")
 
         event = Event(title)
 
         if(event is None):
-            raise ValueError("Invalid Title")
+            raise ValueError("ERROR: BSUser buy: Invalid Title")
 
         if(numTickets < 4):
             remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
@@ -56,4 +56,4 @@ class BSUser(User):
                 else:
                     print("Transaction Cancelled")
         else:
-            raise ValueError("Cannot buy more than 4 tickets at a time")
+            raise ValueError("ERROR: BSUser buy: Cannot buy more than 4 tickets at a time")

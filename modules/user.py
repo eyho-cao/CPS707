@@ -24,7 +24,7 @@ class User():
             self.credit = result.get('credit')
             self.neweventList = []
         else:
-            raise ValueError("User does not exist")
+            raise ValueError("ERROR: User __init_:User does not exist")
 
     def __str__(self):
         """
@@ -82,9 +82,9 @@ class User():
                 f.write(transaction) 
                 f.close()
             else:
-                raise ValueError("Exceeds credit limit")
+                raise ValueError("ERROR: User addCredit: Exceeds credit limit")
         else:
-            raise ValueError("Value must be greater than zero")
+            raise ValueError("ERROR: User addCredit: Value must be greater than zero")
 
     def appendEvent(self, event):
         newEventList.append(event)
@@ -126,15 +126,15 @@ class User():
                             #add this transaction to an output file... 
                             #TODO
                         else:
-                            raise ValueError("The owner does not exist")
+                            raise ValueError("ERROR: User createEvent: The owner does not exist")
                     else:
-                        raise ValueError("The date entered is not valid")
+                        raise ValueError("ERROR: User createEvent: The date entered is not valid")
                 else:
-                    raise ValueError("The quantity cannot be less than zero")
+                    raise ValueError("ERROR: User createEvent: The quantity cannot be less than zero")
             else:
-                raise ValueError("The price is invalid")
+                raise ValueError("ERROR: User createEvent: The price is invalid")
         else:
-            raise ValueError("An event of the same name already exists")
+            raise ValueError("ERROR: User createEvent: An event of the same name already exists")
 
     def getCredit(self):
         """
@@ -171,16 +171,16 @@ class User():
         f.close()
 
     def refund(self, seller, buyer, credit):
-        raise ValueError("Insufficient Permissions")
+        raise ValueError("ERROR: User refund: Insufficient Permissions")
 
     def createUser(self, username, userType, credit=0):
-        raise ValueError("Insufficient Permissions")
+        raise ValueError("ERROR: User refund: Insufficient Permissions")
 
     def sell(self, title, price, numTickets):
-        raise ValueError("Insufficient Permissions")
+        raise ValueError("ERROR: User refund: Insufficient Permissions")
 
     def buy(self, title, numTickets, seller):
-        raise ValueError("Insufficient Permissions")
+        raise ValueError("ERROR: User refund: Insufficient Permissions")
 
     def deleteUser(self, username):
-        raise ValueError("Insufficient Permissions")
+        raise ValueError("ERROR: User refund: Insufficient Permissions")

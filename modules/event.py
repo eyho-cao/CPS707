@@ -29,7 +29,7 @@ class Event():
             self.dateTime = result.get('date')
             self.owner = result.get('owner')
         else:
-            raise ValueError("Event does not exist")
+            raise ValueError("ERROR: Event __init__: Event does not exist")
 
 
     def getName(self):
