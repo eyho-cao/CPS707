@@ -75,7 +75,7 @@ class TestFSUser(unittest.TestCase):
         """
         self.fullSUser.sell("Among Us: The Movie 2", 2, 20)
         self.fullSUser.logout()
-        testf = "C:/Users/Eyho Cao/Documents/GitHub/CPS707/modules/fullSUser/daily_transaction_file.txt"
+        testf = "daily_transaction_file.txt"
         expectedf = "../ExpectedOutput/sell_success.txt"
         self.assertTrue(filecmp.cmp(testf, expectedf))
     def test_sell_invalid_price(self):

@@ -139,7 +139,7 @@ class TestAdmin(unittest.TestCase):
 
     def test_buy_admin_ticket_count_exceeded(self):
         try:
-            self.user.buy("The Rumble in the Jungle", 5, "trinh")
+            self.user.buy1("The Rumble in the Jungle", 5, "trinh")
 
         except ValueError as e:
             self.assertEqual(type(e), ValueError)
@@ -147,30 +147,30 @@ class TestAdmin(unittest.TestCase):
 
     def test_buy_admin_out_of_tickets(self):
         try:
-            self.user.buy("The Rumble in the Jungle", 9999999, "trinh")
+            self.user.buy1("The Rumble in the Jungle", 9999999, "trinh")
         except ValueError as e:
             self.assertEqual(type(e), ValueError)
 
     def test_refund_invalid_amount(self):
         try:
-            self.user.refund("billy", "trinh", 9999999999)
+            self.user.refund1("billy", "trinh", 9999999999)
         except ValueError as e:
             self.assertEqual(type(e), ValueError)
 
     def test_refund_invalid_seller(self):
         try:
-            self.user.refund("billy", "notaUser", 10)
+            self.user.refund1("billy", "notaUser", 10)
         except ValueError as e:
             self.assertEqual(type(e), ValueError)
 
     def test_refund_invalid_buyer(self):
         try:
-            self.user.refund("notaUser", "trinh", 10)
+            self.user.refund1("notaUser", "trinh", 10)
         except ValueError as e:
             self.assertEqual(type(e), ValueError)
 
     def test_refund_valid(self):
-        self.user.refund("billy", "trinh", 1)
+        self.user.refund1("billy", "trinh", 1)
         self.user.logout()
         testf = "daily_transaction_file.txt"
         expectedf = "../ExpectedOutput/refund_valid.txt"
