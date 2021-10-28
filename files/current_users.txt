@@ -1,0 +1,8 @@
+trinh AA 5000
+billy FS 0
+billyboo FS 0
+billy2 FS 0
+billy3 FS 0
+billy4 FS 0
+oldboy AA 0
+admin AA 0

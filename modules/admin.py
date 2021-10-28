@@ -15,8 +15,18 @@ eventCollection = db["events"]
 
 class Admin(User):
 
-    #def __init__(self):
-     #   pass 
+    def __init__(self, username):
+        #check if the username is unique
+        query = {"username": username} 
+        result = collection.find_one(query) 
+        #check if usename exceeds character limit 
+        
+        if(result != None and result.get("type") == "AA"):
+            self.username = username
+            self.type = result.get('type')
+            self.credit = result.get('credit')
+        else:
+            raise ValueError("User does not exist")
 
 
     def createUser(self, username, type, credit=0):
@@ -298,9 +308,18 @@ class Admin(User):
         else:
             raise ValueError("Value must be greater than zero")
 
-    def checkUnique(username):
-        #uneeded, this is handled in the User object constructor
-        return 0
+    def updateCurrentUsers(self):
+        """
+        Updates current_users.txt, the current users file 
+        """
+
+        f = open('../files/current_users.txt', "w")
+
+        for user in collection.find(): 
+            line = user.get("username") + " " + user.get("type") + " " + str(user.get("credit")) + "\n"
+            f.write(line)
+        
+        f.close() 
 
 
 
