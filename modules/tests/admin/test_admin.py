@@ -3,7 +3,7 @@ import pymongo
 import os
 import filecmp
 import sys
-sys.path.insert(1, '../')
+sys.path.insert(1, '../../')
 from admin import Admin
 
 client = pymongo.MongoClient("mongodb+srv://ADMIN:ukdkXvAUbfYBFezo@cluster0.0eg8l.mongodb.net/cps707?ssl=true&ssl_cert_reqs=CERT_NONE")
