@@ -1,6 +1,7 @@
 import unittest 
 import pymongo
 import sys
+import os
 sys.path.insert(1,'../')
 from user import User
 from fullSUser import FSUser
@@ -16,7 +17,7 @@ class TestFSUser(unittest.TestCase):
         setUp(self) is a function that runs before every test case, 
         in this case I wanted to make a new user everytime 
         """
-        self.fullSUser = FSUser("oldboy")
+        self.fullSUser = FSUser("billy")
 
     def tearDown(self):
         """
@@ -25,6 +26,8 @@ class TestFSUser(unittest.TestCase):
 
         not required, but just fyi 
         """
+        if(os.path.exists('./daily_transaction_file.txt')):
+            os.remove("daily_transaction_file.txt")
         pass 
 
     def test_str(self):
@@ -37,7 +40,7 @@ class TestFSUser(unittest.TestCase):
 
         self.assertEqual(
             str(self.fullSUser),
-            "User(username=oldboy, type=AA, credit=0)"
+            "User(username=billy, type=FS, credit=0)"
         )
 
     def test_get_user(self):
@@ -50,7 +53,7 @@ class TestFSUser(unittest.TestCase):
     def test_get_username(self):
         self.assertEqual(
             self.fullSUser.getUsername(), 
-            'oldboy'
+            'billy'
         )
 
     def test_get_credit(self):
@@ -62,7 +65,7 @@ class TestFSUser(unittest.TestCase):
     def test_get_type(self):
         self.assertEqual(
             self.fullSUser.getType(),
-            "AA"
+            "FS"
         )
 
     def test_sell_invalid_price(self):
@@ -96,7 +99,7 @@ class TestFSUser(unittest.TestCase):
         """
         this test passes if all passed arguements are valid
         """
-        result = self.fullSUser.sell("Among Us: The Movie", 2, 20)
+        result = self.fullSUser.sell("Among Us: The Movie 2", 2, 20)
         self.assertEqual(result, "03 oldboy__________Among Us: The Movie_2___20____")
 
     def test_buy_invalid_numTickets(self):
@@ -110,6 +113,30 @@ class TestFSUser(unittest.TestCase):
     def test_buy_invalid_remainingTickets(self):
         try:
             self.fullSUser.buy("Among Us: The Movie", 10000, "trinh")
+        except ValueError as e:
+            self.assertEqual(type(e), ValueError)
+
+    def test_delete_insufficient_credentials(self):
+        fsUserObj = FSUser("billy")
+        testFSName = "billytoo"
+        try:
+            fsUserObj.deleteUser(testFSName)
+        except ValueError as e:
+            self.assertEqual(type(e), ValueError)
+
+    def test_create_not_privilaged(self):
+        fsUserObj = FSUser("billy")
+        testFSName = "nagakabouros"
+        try:
+            fsUserObj.createUser(testFSName, "FS")
+        except ValueError as e:
+            self.assertEqual(type(e), ValueError)
+
+    def test_refund_not_privilaged(self):
+        try:
+            fsUserObj = FSUser("billy")
+            testFSName = "billy2"
+            fsUserObj.refund(fsUserObj.getUsername(), testFSName, 100)
         except ValueError as e:
             self.assertEqual(type(e), ValueError)
 

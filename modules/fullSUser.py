@@ -10,45 +10,51 @@ eventCollection = db["events"]
 
 class FSUser(User):
     def sell(self, title, numTickets, price):
+        eventObj = Event.getEvent(title)
+        if(eventObj != None):
+            raise ValueError("Event name already used!")
         if(price > 999.99):
             raise ValueError("Sell Price cannot exceed $999.99")
         if(len(title) > 25):
             raise ValueError("Event Title cannot exceed 25 characters")
-        eventQuery ={"events", title}
-        if(not (len(collection.find_one(eventQuery)) == 1)):
-            raise ValueError("Event name already used")
+        
         if(numTickets > 100):
            raise ValueError("Event cannot have more than 100 tickets")
-        #do stuff
-        #add to transaction file NOTE: since the event cant sell tickets until after the seller user logs off i think it might be best if we run a routine right before logging out that then adds the event
-        transaction = "03 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
+
+        #format of vars for list: [title, numtickets, price]
+        #self.appendEvent([title, numTickets, price])
+        print(self.getEventList())
+        transaction = "03 " + str(self.getUsername() + (" " * (15 - len(self.getUsername())))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
         f = open("daily_transaction_file.txt", "a") 
         f.write(transaction) 
         f.close()
         print("Event Created - " +"Event Name: " +title +" Ticket Price: " +price +" Number of tickets to be sold: " +numTickets)
 
-
     def buy(self, title, numTickets, sellName):
         sellerQuery = {"username:": sellName}
         eventQuery = {"events": title}
-        if(not (len(collection.find_one(sellerQuery)) == 1)):
-            raise ValueError("Invalid Seller");
-        event = getEvent(title)
-        if(None):
-            raise ValueError("Invalid Title");
-        remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
-        titlePrice = event.price('price')
+        sellObj = User.getUser(self, sellName)
+        if(sellObj is None):
+            raise ValueError("Invalid Seller")
+
+        event = Event(title)
+
+        if(event is None):
+            raise ValueError("Invalid Title")
+
         if(numTickets < 4):
+            remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
+            titlePrice = event.getPrice()
             if(remainingTick >=0):
-                print("\nPrice per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
-                userInput = input("Confirm Transaction Y/N\n")
+                print("Price per Ticket: " +str(titlePrice) +"\nTotal Price: " +str(titlePrice*numTickets))
+                userInput = input("Confirm Transaction Y/N")
                 if(userInput == "Y" or userInput == "yes" or userInput == "Yes" or userInput == "y"):
                     ticketsLeft = { "$set": {
                         "quantity": remainingTick
                     }}
 
-                    eventCollection.update_one(eventQuery, remainingTick)
-                    transaction = "04" + str(self.username + (" " * (15 - len(self.username)))) + " " + title + " " + str(str(numTickets) + (" " * (3 - len(str(numTickets))))) + " " + str(str(titlePrice) + (" " * (6 - len(str(titlePrice)))))+"\n"
+                    eventCollection.update_one(eventQuery, ticketsLeft)
+                    transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
                     f = open("daily_transaction_file.txt", "a") 
                     f.write(transaction) 
                     f.close()

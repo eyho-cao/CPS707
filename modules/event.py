@@ -38,17 +38,26 @@ class Event():
         """
         return self.name 
 
+    def setName(self, name):
+        self.name = name
+
     def getPrice(self):
         """
         Return price of event
         """
         return self.price
 
+    def setPrice(self, price):
+        self.price = price
+
     def getQuantity(self):
         """
         Return quantity of tickets available for event
         """
         return self.quantity
+
+    def setQuantity(self, quantity):
+        self.quantity = quantity
 
     def getDateTime(self):
         """
@@ -86,11 +95,12 @@ class Event():
         """
         Return Event object based on unique event name
         """
-        query = {"events:", eventName}
+        query = {"events:": eventName}
         result = collection.find_one(query)
-        event = Event(result.get('name'))
-        
-        return event
+        if(result):
+            event = Event(result.get('name'))
+            return event
+        return None
 
     def __str__(self): 
         """

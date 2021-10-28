@@ -67,7 +67,6 @@ class Admin(User):
         else:
             raise ValueError('Username is not unique')
 
-
     def createEvent(self, name, price, quantity, date, time, owner):
 
         query = {"name": name}
@@ -235,7 +234,7 @@ class Admin(User):
                 collection.update_one(query, newCredit)
 
                 #add the transaction to the daily transaction file 
-                transaction = '06' + " " + str(user.getUsername()) + " " + user.getType() + " " + str(str(self.credit+credit))+"\n"
+                transaction = '06' + " " + str(user.getUsername()) + " " + user.getType() + " " + str(user.getCredit()+credit)+"\n"
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
                 f.close()
