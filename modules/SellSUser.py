@@ -11,6 +11,9 @@ eventCollection = db["events"]
 
 class SSUser(User):
     def sell(self, title, numTickets, price):
+        """
+        create new event to sell
+        """
         if(price > 999.99):
             raise ValueError("ERROR: SSUser sell: Sell Price cannot exceed $999.99")
         if(len(title) > 25):

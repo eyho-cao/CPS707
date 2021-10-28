@@ -90,12 +90,21 @@ class User():
             raise ValueError("ERROR: User addCredit: Value must be greater than zero")
 
     def appendEvent(self, event):
+        """
+        append new event object to newEventList
+        """
         self.newEventList.append(event)
 
     def getEventList(self):
+        """
+        return newEventList object
+        """
         return self.newEventList
 
     def addEventsDB(self):
+        """
+        add stored events to DB
+        """
         now = datetime.now()
         time = now.strftime("%H:%M:%S")
         date = now.date()
@@ -103,6 +112,9 @@ class User():
             self.createEvent(str(i[0]), float(i[1]), float(i[2]), date, time)
 
     def createEvent(self, name, price, quantity, date, time):
+        """
+        insert Event in DB
+        """
         query = {"name": name}
         result = collection.find_one(query)
         owner = self.getUsername()

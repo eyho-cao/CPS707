@@ -10,6 +10,9 @@ eventCollection = db["events"]
 
 class FSUser(User):
     def sell(self, title, numTickets, price):
+        """
+        create new event to sell
+        """
         eventObj = Event.getEvent(title)
         if(eventObj != None):
             raise ValueError("ERROR: FSUser sell: Event name already used!")

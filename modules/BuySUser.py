@@ -25,6 +25,9 @@ class BSUser(User):
     decrease num ticket if user buys
     """
     def buy(self, title, numTickets, sellName):
+        """
+        buy tickets
+        """
         sellerQuery = {"username:": sellName}
         eventQuery = {"events": title}
         sellObj = User.getUser(self, sellName)
