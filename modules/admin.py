@@ -321,6 +321,20 @@ class Admin(User):
         
         f.close() 
 
+    def updateAvailableTickets(self):
+        """
+        updates the avaible tickets file 
+        """
+
+        f = open('../files/available_tickets.txt', "w") 
+
+        for event in eventCollection.find():
+            line = event.get("name") + " " + event.get("owner") + " " + str(event.get("quantity")) + " " + str(event.get("price")) + "\n"
+            f.write(line)
+        
+        f.close()
+
+
 
 
 #--------- HELPER FUNCTIONS ---------# 
