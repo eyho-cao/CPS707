@@ -27,29 +27,33 @@ class BSUser(User):
     def buy(self, title, numTickets, sellName):
         sellerQuery = {"username:": sellName}
         eventQuery = {"events": title}
-        if(not (len(collection.find_one(sellerQuery)) == 1)):
-            raise ValueError("Invalid Seller");
-        event = getEvent(title)
-        if(None):
-            raise ValueError("Invalid Title");
-        remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
-        titlePrice = event.price('price')
+        sellObj = User.getUser(self, sellName)
+        if(sellObj is None):
+            raise ValueError("ERROR: BSUser buy: Invalid Seller")
+
+        event = Event(title)
+
+        if(event is None):
+            raise ValueError("ERROR: BSUser buy: Invalid Title")
+
         if(numTickets < 4):
+            remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
+            titlePrice = event.getPrice()
             if(remainingTick >=0):
-                print("\nPrice per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
-                userInput = input("Confirm Transaction Y/N\n")
+                print("Price per Ticket: " +str(titlePrice) +"\nTotal Price: " +str(titlePrice*numTickets))
+                userInput = input("Confirm Transaction Y/N")
                 if(userInput == "Y" or userInput == "yes" or userInput == "Yes" or userInput == "y"):
                     ticketsLeft = { "$set": {
                         "quantity": remainingTick
                     }}
 
-                    eventCollection.update_one(eventQuery, remainingTick)
-                    transaction = "04" + str(self.username + (" " * (15 - len(self.username)))) + " " + title + " " + str(str(numTickets) + (" " * (3 - len(str(numTickets))))) + " " + str(str(titlePrice) + (" " * (6 - len(str(titlePrice)))))+"\n"
-
+                    eventCollection.update_one(eventQuery, ticketsLeft)
+                    transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
                     f = open("daily_transaction_file.txt", "a") 
                     f.write(transaction) 
+                    f.close()
                     print("Transaction Confirmed")
                 else:
                     print("Transaction Cancelled")
         else:
-            raise ValueError("Cannot buy more than 4 tickets at a time")
+            raise ValueError("ERROR: BSUser buy: Cannot buy more than 4 tickets at a time")

@@ -26,7 +26,7 @@ class Admin(User):
             self.type = result.get('type')
             self.credit = result.get('credit')
         else:
-            raise ValueError("User does not exist")
+            raise ValueError("ERROR: Admin __init__: User does not exist")
 
 
     def createUser(self, username, type, credit=0):
@@ -35,7 +35,7 @@ class Admin(User):
         Default credit value to zero, unless other value is specified 
         """
         if(len(username) > 25):
-            raise ValueError("Username exceeds 25 character limit")
+            raise ValueError("ERROR: Admin createUser: Username exceeds 25 character limit")
 
         query = {"username": username} 
         result = collection.find_one(query) 
@@ -61,12 +61,11 @@ class Admin(User):
                     
 
                 else:
-                    raise ValueError("Value for credit is not valid")
+                    raise ValueError("ERROR: Admin createUser: Value for credit is not valid")
             else:
-                raise ValueError("User type is invalid") 
+                raise ValueError("ERROR: Admin createUser: User type is invalid") 
         else:
-            raise ValueError('Username is not unique')
-
+            raise ValueError('ERROR: Admin createUser: Username is not unique')
 
     def createEvent(self, name, price, quantity, date, time, owner):
 
@@ -98,57 +97,27 @@ class Admin(User):
                             #add this transaction to an output file... 
                             #TODO
                         else:
-                            raise ValueError("The owner does not exist")
+                            raise ValueError("ERROR: Admin createEvent: The owner does not exist")
                     else:
-                        raise ValueError("The date entered is not valid")
+                        raise ValueError("ERROR: Admin createEvent: The date entered is not valid")
                 else:
-                    raise ValueError("The quantity cannot be less than zero")
+                    raise ValueError("ERROR: Admin createEvent: The quantity cannot be less than zero")
             else:
-                raise ValueError("The price is invalid")
+                raise ValueError("ERROR: Admin createEvent: The price is invalid")
         else:
-            raise ValueError("An event of the same name already exists")
-
-
+            raise ValueError("ERROR: Admin createEvent: An event of the same name already exists")
 
     def buy(self, title, numTickets, sellName):
         sellerQuery = {"username:": sellName}
         eventQuery = {"events": title}
-        if(not (len(collection.find_one(sellerQuery)) == 1)):
-            raise ValueError("Invalid Seller")
-        event = getEvent(title)
-        if(None):
-            raise ValueError("Invalid Title")
-        remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
-        titlePrice = event.price('price')
-        if(remainingTick >=0):
-            print("\nPrice per Ticket: " +titlePrice +"\nTotal Price: " +titlePrice*numTickets)
-            userInput = input("Confirm Transaction Y/N\n")
-            if(userInput == "Y" or userInput == "yes" or userInput == "Yes"):
-                ticketsLeft = { "$set": {
-                    "quantity": remainingTick
-                }}
-
-                eventCollection.update_one(eventQuery, remainingTick)
-                transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
-                f = open("daily_transaction_file.txt", "a") 
-                f.write(transaction) 
-                f.close()
-                print("Transaction Confirmed")
-            else:
-                print("Transaction Cancelled")
-
-                #proposed changes to buy method - Eyho
-    def buy1(self, title, numTickets, sellName):
-        sellerQuery = {"username:": sellName}
-        eventQuery = {"events": title}
         sellObj = User.getUser(self, sellName)
         if(sellObj is None):
-            raise ValueError("Invalid Seller")
+            raise ValueError("ERROR: Admin buy: Invalid Seller")
 
         event = Event(title)
 
         if(event is None):
-            raise ValueError("Invalid Title")
+            raise ValueError("ERROR: Admin buy: Invalid Title")
 
         remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
         titlePrice = event.getPrice()
@@ -171,14 +140,14 @@ class Admin(User):
 
     def sell(self, title, numTickets, price):
         if(price > 999.99):
-            raise ValueError("Sell Price cannot exceed $999.99")
+            raise ValueError("ERROR: Admin sell: Sell Price cannot exceed $999.99")
         if(len(title) > 25):
-            raise ValueError("Event Title cannot exceed 25 characters")
+            raise ValueError("ERROR: Admin sell: Event Title cannot exceed 25 characters")
         eventQuery ={"events", title}
         if(not (len(collection.find_one(eventQuery)) == 1)):
-            raise ValueError("Event name already used")
+            raise ValueError("ERROR: Admin sell: Event name already used")
         if(numTickets > 100):
-           raise ValueError("Event cannot have more than 100 tickets")
+           raise ValueError("ERROR: Admin sell: Event cannot have more than 100 tickets")
         #do stuff
         #add to transaction file NOTE: since the event cant sell tickets until after the seller user logs off i think it might be best if we run a routine right before logging out that then adds the event
         transaction = "03 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
@@ -192,7 +161,7 @@ class Admin(User):
         Deletes user from database
         """
         if(username == self.getUsername()):
-            raise ValueError("Cannot delete, logged in as user")
+            raise ValueError("ERROR: Admin deleteUser: Cannot delete, logged in as user")
         elif(User.getUser(self, username)):
             #delete the user from the database 
             collection.delete_one({"username": username})
@@ -203,49 +172,15 @@ class Admin(User):
             f.write(transaction)
             f.close()
         else:
-            raise ValueError("User not found")
+            raise ValueError("ERROR: Admin deleteUser: User not found")
 
     def deleteTicket(ticket):
         """
         Delete a ticket from the DB 
         """
-        pass 
+        pass
 
-    def refund(self, buyName, sellName, amount):
-        return 0
     def refund(self, buyer, seller, credit):
-        """
-        Issue a refund from seller to buyer of amount credit 
-        buyer:  buyer username 
-        seller: seller username 
-        NOTE: do not pass through user objects, just their usernames 
-        """
-
-        #Check if buyer exists 
-        buyerQuery = {"username:": buyer}
-        if((len(collection.find_one(buyerQuery)) == 1) and credit > 0):
-            #Make appropriate changes to each respective users' accounts 
-            if(self.credit + credit < 999999):
-                #Check if transaction will cause seller to exceed maximum credit limit 
-                sellerQuery = {"username:": self.username}
-                sellerCredit = { "$set": {
-                    "credit": self.credit + credit
-                }}
-                buyerCredit = { "$set": {
-                    "credit": self.credit - credit
-                }}
-                collection.update_one(buyerQuery, buyerCredit)
-                collection.update_one(sellerQuery, sellerCredit)
-            else:
-                raise ValueError("Seller is over credit limit")
-        elif(len(collection.find_one(buyerQuery) == 0)):
-            raise ValueError("Buyer does not exist")
-        elif(credit < 0):
-            raise ValueError("Invalid value for credit")
-        #my proposed refund method - Eyho
-
-
-    def refund1(self, buyer, seller, credit):
         buyerObj = Admin.getUser(self,buyer)
         sellerObj = Admin.getUser(self,seller)
         if(buyerObj is not None and sellerObj is not None and credit > 0):
@@ -267,15 +202,15 @@ class Admin(User):
                     f.write(transaction)
                     f.close()
                 else:
-                    raise ValueError("Seller is over credit limit")
+                    raise ValueError("ERROR: Admin refund: Seller is over credit limit")
             else:
-                raise ValueError("Seller does not have sufficient funds")
+                raise ValueError("ERROR: Admin refund: Seller does not have sufficient funds")
         elif(buyerObj is None):
-            raise ValueError("Buyer does not exist")
+            raise ValueError("ERROR: Admin refund: Buyer does not exist")
         elif(sellerObj is None):
-            raise ValueError("Seller does not exist")
+            raise ValueError("ERROR: Admin refund: Seller does not exist")
         elif(credit < 0):
-            raise ValueError("Invalid value for credit")
+            raise ValueError("ERROR: Admin refund: Invalid value for credit")
 
 
        
@@ -286,7 +221,7 @@ class Admin(User):
 
         user = self.getUser(username)
         if(user is None):
-            raise ValueError("Username Not Found")
+            raise ValueError("ERROR: Admin addCredit: Username Not Found")
 
         if(credit >= 0):
             if(user.getCredit() + credit <= 999999):
@@ -299,14 +234,14 @@ class Admin(User):
                 collection.update_one(query, newCredit)
 
                 #add the transaction to the daily transaction file 
-                transaction = '06' + " " + str(user.getUsername()) + " " + user.getType() + " " + str(str(self.credit+credit))+"\n"
+                transaction = '06' + " " + str(user.getUsername()) + " " + user.getType() + " " + str(user.getCredit()+credit)+"\n"
                 f = open("daily_transaction_file.txt", "a") 
                 f.write(transaction) 
                 f.close()
             else:
-                raise ValueError("Exceeds credit limit")
+                raise ValueError("ERROR: Admin addCredit: Exceeds credit limit")
         else:
-            raise ValueError("Value must be greater than zero")
+            raise ValueError("ERROR: Admin addCredit: Value must be greater than zero")
 
     def updateCurrentUsers(self):
         """

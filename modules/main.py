@@ -33,6 +33,7 @@ def main():
                     print("Already Logged in")
 
                 elif(com == "logout" or com == "Logout"):
+                    user.addEventsDB()
                     user.logout()
                     user = None
                     loggedIn = False
