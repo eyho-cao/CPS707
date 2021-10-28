@@ -13,6 +13,7 @@ class User():
         Default credit value to zero, unless other value is specified 
         """
 
+
         #check if the username is unique
         query = {"username": username} 
         result = collection.find_one(query) 
@@ -22,7 +23,7 @@ class User():
             self.username = username
             self.type = result.get('type')
             self.credit = result.get('credit')
-            self.neweventList = []
+            self.newEventList = []
         else:
             raise ValueError("ERROR: User __init_:User does not exist")
 
@@ -87,10 +88,10 @@ class User():
             raise ValueError("ERROR: User addCredit: Value must be greater than zero")
 
     def appendEvent(self, event):
-        newEventList.append(event)
+        self.newEventList.append(event)
 
     def getEventList(self):
-        return newEventList
+        return self.newEventList
 
     def addEventsDB(self):
 

@@ -1,6 +1,7 @@
 import unittest 
 import pymongo
 import sys
+import filecmp
 import os
 sys.path.insert(1,'../')
 from user import User
@@ -68,6 +69,15 @@ class TestFSUser(unittest.TestCase):
             "FS"
         )
 
+    def test_sell_success(self):
+        """
+        this test passes if all passed arguements are valid
+        """
+        self.fullSUser.sell("Among Us: The Movie 2", 2, 20)
+        self.fullSUser.logout()
+        testf = "C:/Users/Eyho Cao/Documents/GitHub/CPS707/modules/fullSUser/daily_transaction_file.txt"
+        expectedf = "../ExpectedOutput/sell_success.txt"
+        self.assertTrue(filecmp.cmp(testf, expectedf))
     def test_sell_invalid_price(self):
         """
         this test passes if a ValueError is returned after giving an invalid ticket price
@@ -94,13 +104,6 @@ class TestFSUser(unittest.TestCase):
             self.fullSUser.sell("Among Us: The Movie", 101, 15)
         except ValueError as e:
             self.assertEqual(type(e), ValueError)
-
-    def test_sell_success(self):
-        """
-        this test passes if all passed arguements are valid
-        """
-        result = self.fullSUser.sell("Among Us: The Movie 2", 2, 20)
-        self.assertEqual(result, "03 oldboy__________Among Us: The Movie_2___20____")
 
     def test_buy_invalid_numTickets(self):
         try:
