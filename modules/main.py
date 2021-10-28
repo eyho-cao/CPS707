@@ -6,6 +6,7 @@ from admin import Admin
 from login import Login
 import pymongo
 import os
+import shlex
 
 client = pymongo.MongoClient("mongodb+srv://ADMIN:ukdkXvAUbfYBFezo@cluster0.0eg8l.mongodb.net/cps707?ssl=true&ssl_cert_reqs=CERT_NONE")
 db = client["cps707"] 
@@ -21,7 +22,7 @@ def main():
     while(run):
 
         command = input()
-        comList = command.split()
+        comList = shlex.split(command)
         if(len(command) > 0):
 
             #commands run while user logged in
@@ -43,7 +44,7 @@ def main():
                     if(comLen == 3):
                         user.create(comList[1], comList[2])
                     elif(comLen == 4):
-                        user.create(comList[1], comList[2], comList[3])
+                        user.create(comList[1], comList[2], float(comList[3]))
                     else:
                         print("Expected Usage: 'create (username) (type) (credit[optional])")
 
@@ -55,31 +56,31 @@ def main():
 
                 elif(com =="sell" or com == "Sell"):
                     if(comLen == 4):
-                        user.sell(comList[1], comList[2], comList[3])
+                        user.sell(comList[1], float(comList[2]), float(comList[3]))
                     else:
                         print("Expected Usage: 'sell (event name) (num. tickets) (sale price)'")
 
                 elif(com == "buy" or com =="Buy"):
                     if(comLen == 4):
-                        user.buy(comList[1], comList[2], comList[3])
+                        user.buy(comList[1], float(comList[2]), comList[3])
                     else:
                         print("Expected Usage: 'buy (event name) (num. tickets) (seller name)'")
 
                 elif(com == "refund" or com == "Refund"):
                     if(comLen == 4):
-                        user.refund(comList[2], comList[2], comList[3])
+                        user.refund(comList[2], comList[2], float(comList[3]))
                     else:
                         print("Expected Usage: 'refund (buyer) (seller) (amount)'")
 
                 elif(com == "addcredit" or com == "Addcredit"):
                     if(user.getType() != "AA"):
                         if(comLen == 2):
-                            user.addCredit(comList[1], comList[2])
+                            user.addCredit(float(comList[2]))
                         else:
                             print("Expected Usage: 'addcredit (credit)'")
                     else:
                         if(comLen == 3):
-                            user.addCredit(comList[1], comList[2])
+                            user.addCredit(comList[1], float(comList[2]))
                         else:
                             print("Expected Usage: 'addcredit (username) (credit)'")
 
