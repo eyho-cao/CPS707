@@ -18,11 +18,14 @@ class FSUser(User):
             raise ValueError("ERROR: FSUser sell: Event name already used!")
         if(price > 999.99):
             raise ValueError("ERROR: FSUser sell: Sell Price cannot exceed $999.99")
+        if(price < 0):
+            raise ValueError("ERROR: FSUser sell: Sell Price cannot be a negative number")
         if(len(title) > 25):
             raise ValueError("ERROR: FSUser sell: Event Title cannot exceed 25 characters")
-        
         if(numTickets > 100):
            raise ValueError("ERROR: FSUser sell: Event cannot have more than 100 tickets")
+        if(numTickets < 0):
+            raise ValueError("ERROR: FSUser sell: Event cannot have a negative number of tickets")
 
         #format of vars for list: [title, numtickets, price]
         self.appendEvent([title, numTickets, price])
