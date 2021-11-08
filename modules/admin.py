@@ -1,6 +1,6 @@
 import sys
 import pymongo
-sys.path.insert(1,'../CPS707/modules/user/')
+sys.path.insert(1,'../CPS707/modules')
 from user import User
 from event import Event
 
@@ -14,21 +14,6 @@ collection = db["users"]
 eventCollection = db["events"]
 
 class Admin(User):
-
-    def __init__(self, username):
-        #check if the username is unique
-        query = {"username": username} 
-        result = collection.find_one(query) 
-        #check if usename exceeds character limit 
-        
-        if(result != None and result.get("type") == "AA"):
-            self.username = username
-            self.type = result.get('type')
-            self.credit = result.get('credit')
-        else:
-            raise ValueError("ERROR: Admin __init__: User does not exist")
-
-
     def createUser(self, username, type, credit=0):
         """
         Create a User object 
@@ -55,7 +40,7 @@ class Admin(User):
                     
                     #add this transaction to the daily transaction file 
                     transaction = "01 " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
-                    f = open("daily_transaction_file.txt", "a") 
+                    f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                     f.write(transaction) 
                     f.close()
                     
@@ -66,46 +51,6 @@ class Admin(User):
                 raise ValueError("ERROR: Admin createUser: User type is invalid") 
         else:
             raise ValueError('ERROR: Admin createUser: Username is not unique')
-
-    def createEvent(self, name, price, quantity, date, time, owner):
-
-        query = {"name": name}
-        result = collection.find_one(query)
-
-        #Check for validity of inputs 
-        if(result == None):
-            if(price > 0):
-                if(quantity > 0):
-                    if(isValidDate(date)):
-                        if(findUser(owner)):
-                            
-                            if("AM" in time.upper() or "PM" in time.upper()): time = formatTime(time)
-                            dateTime = formatDate(date, time) 
-                           
-                            
-                            #add the user to the database
-                            event = {
-                                "name": name,
-                                "price": price,
-                                "quantity": quantity,
-                                "datetime": dateTime,
-                                "owner": owner
-                            }
-
-                            collection.insert_one(event)
-
-                            #add this transaction to an output file... 
-                            #TODO
-                        else:
-                            raise ValueError("ERROR: Admin createEvent: The owner does not exist")
-                    else:
-                        raise ValueError("ERROR: Admin createEvent: The date entered is not valid")
-                else:
-                    raise ValueError("ERROR: Admin createEvent: The quantity cannot be less than zero")
-            else:
-                raise ValueError("ERROR: Admin createEvent: The price is invalid")
-        else:
-            raise ValueError("ERROR: Admin createEvent: An event of the same name already exists")
 
     def buy(self, title, numTickets, sellName):
         sellerQuery = {"username:": sellName}
@@ -131,7 +76,7 @@ class Admin(User):
 
                 eventCollection.update_one(eventQuery, ticketsLeft)
                 transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
-                f = open("daily_transaction_file.txt", "a") 
+                f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                 f.write(transaction) 
                 f.close()
                 print("Transaction Confirmed")
@@ -139,22 +84,30 @@ class Admin(User):
                 print("Transaction Cancelled")
 
     def sell(self, title, numTickets, price):
+        """
+        create new event to sell
+        """
+        eventObj = Event.getEvent(title)
+        if(eventObj != None):
+            raise ValueError("ERROR: Admin sell: Event name already used!")
         if(price > 999.99):
             raise ValueError("ERROR: Admin sell: Sell Price cannot exceed $999.99")
+        if(price < 0):
+            raise ValueError("ERROR: Admin sell: Sell Price cannot be a negative number")
         if(len(title) > 25):
             raise ValueError("ERROR: Admin sell: Event Title cannot exceed 25 characters")
-        eventQuery ={"events", title}
-        if(not (len(collection.find_one(eventQuery)) == 1)):
-            raise ValueError("ERROR: Admin sell: Event name already used")
         if(numTickets > 100):
-           raise ValueError("ERROR: Admin sell: Event cannot have more than 100 tickets")
-        #do stuff
-        #add to transaction file NOTE: since the event cant sell tickets until after the seller user logs off i think it might be best if we run a routine right before logging out that then adds the event
-        transaction = "03 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
-        f = open("daily_transaction_file.txt", "a") 
-        f.write(transaction)
+            raise ValueError("ERROR: Admin sell: Event cannot have more than 100 tickets")
+        if(numTickets < 0):
+            raise ValueError("ERROR: Admin sell: Event cannot have a negative number of tickets")
+
+        #format of vars for list: [title, numtickets, price]
+        self.appendEvent([title, numTickets, price])
+        transaction = "03 " + str(self.getUsername() + (" " * (15 - len(self.getUsername())))) + " " + str(title + (" " * (25 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(price)))) + str(price)) +"\n"
+        f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+        f.write(transaction) 
         f.close()
-        print("Event Created - " +"Event Name: " +title +"Ticket Price: " +price +" Number of tickets to be sold: " +numTickets)
+        print("Event Created - " +"Event Name: " +title +" Ticket Price: " +str(price) +" Number of tickets to be sold: " +str(numTickets))
 
     def deleteUser(self,username):
         """
@@ -168,7 +121,7 @@ class Admin(User):
 
             #add this transaction to the daily transaction file 
             transaction = "02 " + str(self.username) + " " + self.type + " " + str(str(self.credit)) +"\n"
-            f = open("daily_transaction_file.txt", "a") 
+            f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
             f.write(transaction)
             f.close()
         else:
@@ -235,7 +188,7 @@ class Admin(User):
 
                 #add the transaction to the daily transaction file 
                 transaction = '06' + " " + str(user.getUsername()) + " " + user.getType() + " " + str(user.getCredit()+credit)+"\n"
-                f = open("daily_transaction_file.txt", "a") 
+                f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                 f.write(transaction) 
                 f.close()
             else:
@@ -268,6 +221,16 @@ class Admin(User):
             f.write(line)
         
         f.close()
+
+    def endDay(self):
+        updateCurrentUsers()
+        updateAvailableTickets()
+        transFileEOD()
+
+    def transFileEOD(self):
+        #merge transaction files
+        #purge old transaction files
+        pass
 
 
 
