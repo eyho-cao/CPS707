@@ -230,8 +230,8 @@ class Admin(User):
 
 
     def endDay(self):
-        #self.updateCurrentUsers()
-        #self.updateAvailableTickets()
+        self.updateCurrentUsers()
+        self.updateAvailableTickets()
         self.transFileEOD()
         print("-----------------------------\nDay Closed - User and Ticket files updated - Daily Transaction files merged\nFind merged file in 'MergedDailyTransactionFiles' folder\n-----------------------------")
 
