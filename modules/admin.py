@@ -1,8 +1,12 @@
 import sys
 import pymongo
+import os
+import shutil
+import glob
 sys.path.insert(1,'../CPS707/modules')
 from user import User
 from event import Event
+from datetime import date
 
 
 
@@ -206,7 +210,8 @@ class Admin(User):
         for user in collection.find(): 
             line = user.get("username") + " " + user.get("type") + " " + str(user.get("credit")) + "\n"
             f.write(line)
-        
+
+        f.write("END")
         f.close() 
 
     def updateAvailableTickets(self):
@@ -220,18 +225,40 @@ class Admin(User):
             line = event.get("name") + " " + event.get("owner") + " " + str(event.get("quantity")) + " " + str(event.get("price")) + "\n"
             f.write(line)
         
+        f.write("END")
         f.close()
 
+
     def endDay(self):
-        updateCurrentUsers()
-        updateAvailableTickets()
-        transFileEOD()
+        #self.updateCurrentUsers()
+        #self.updateAvailableTickets()
+        self.transFileEOD()
+        print("-----------------------------\nDay Closed - User and Ticket files updated - Daily Transaction files merged\nFind merged file in 'MergedDailyTransactionFiles' folder\n-----------------------------")
 
     def transFileEOD(self):
+        today = date.today()
+        day = today.strftime("%b-%d-%Y")
+        file = "..\\modules\\MergedDailyTransactionFiles\\daily_transaction_file_" +str(day) +".txt"
+        if(os.path.isfile(file)):
+            os.remove(file)
         #merge transaction files
+        self.dailyTransMerge(file)
         #purge old transaction files
-        pass
-
+        self.purgetransFiles()
+    
+    def dailyTransMerge(self, file):
+        transFilespath = "..\\modules\\TransactionFiles"
+        with open(file, 'wb') as outfile:
+            for filename in glob.glob(transFilespath +'\\*.txt'):
+                with open(filename, 'rb') as readfile:
+                    shutil.copyfileobj(readfile, outfile)
+        f = open(file, "a")
+        f.write("00")
+        f.close()
+    def purgetransFiles(self):
+        transFilespath = "..\\modules\\TransactionFiles"
+        for filename in glob.glob(transFilespath +'\\*.txt'):
+            os.remove(filename)
 
 
 
