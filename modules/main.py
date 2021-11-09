@@ -83,6 +83,13 @@ def main():
                             user.addCredit(comList[1], float(comList[2]))
                         else:
                             print("Expected Usage: 'addcredit (username) (credit)'")
+                elif(com == "close" or com == "Close"):
+                    if(user.getType() == "AA"):
+                        #EOD methods
+                        user.endDay()
+                    else:
+                        print("Access Denied: Insufficient Permissions")
+
 
                 elif(com == "help" and user.getType() == "AA"):
                     print("------------------\nList of Commands: \n------------------\nLogin\nLogout\nCreate\nDelete\nSell\nBuy\nRefund\nAddcredit\n------------------")
