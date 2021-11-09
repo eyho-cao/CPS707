@@ -42,9 +42,9 @@ def main():
 
                 elif(com == "create" or com == "Create"):
                     if(comLen == 3):
-                        user.create(comList[1], comList[2])
+                        user.createUser(comList[1], comList[2])
                     elif(comLen == 4):
-                        user.create(comList[1], comList[2], float(comList[3]))
+                        user.createUser(comList[1], comList[2], float(comList[3]))
                     else:
                         print("Expected Usage: 'create (username) (type) (credit[optional])")
 

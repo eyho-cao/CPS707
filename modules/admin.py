@@ -228,7 +228,7 @@ class Admin(User):
         f.write("END")
         f.close()
 
-
+        #End of day routine
     def endDay(self):
         self.updateCurrentUsers()
         self.updateAvailableTickets()
