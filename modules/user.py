@@ -1,4 +1,5 @@
 import pymongo
+import os
 from datetime import datetime
 
 # initialize connection to mongoDB 
@@ -66,7 +67,7 @@ class User():
         collection.delete_one({"username": self.username})
         #add this transaction to the daily transaction file 
         transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
-        f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+        f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
         f.write(transaction) 
         """
         if(credit >= 0):
@@ -81,7 +82,7 @@ class User():
 
                 #add the transaction to the daily transaction file 
                 transaction = '06' + " " + str(self.getUsername()) + " " + self.getType() + " " + str(str(self.credit+credit))+"\n"
-                f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+                f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                 f.write(transaction) 
                 f.close()
             else:
@@ -183,7 +184,7 @@ class User():
 
         #add the transaction to the daily transaction file 
         transaction = '00' + " " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
-        f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+        f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
         f.write(transaction) 
         f.close()
 

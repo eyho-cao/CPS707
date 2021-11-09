@@ -40,7 +40,7 @@ class Admin(User):
                     
                     #add this transaction to the daily transaction file 
                     transaction = "01 " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
-                    f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+                    f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                     f.write(transaction) 
                     f.close()
                     
@@ -76,7 +76,7 @@ class Admin(User):
 
                 eventCollection.update_one(eventQuery, ticketsLeft)
                 transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
-                f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+                f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                 f.write(transaction) 
                 f.close()
                 print("Transaction Confirmed")
@@ -104,7 +104,7 @@ class Admin(User):
         #format of vars for list: [title, numtickets, price]
         self.appendEvent([title, numTickets, price])
         transaction = "03 " + str(self.getUsername() + (" " * (15 - len(self.getUsername())))) + " " + str(title + (" " * (25 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(price)))) + str(price)) +"\n"
-        f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+        f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
         f.write(transaction) 
         f.close()
         print("Event Created - " +"Event Name: " +title +" Ticket Price: " +str(price) +" Number of tickets to be sold: " +str(numTickets))
@@ -121,7 +121,7 @@ class Admin(User):
 
             #add this transaction to the daily transaction file 
             transaction = "02 " + str(self.username) + " " + self.type + " " + str(str(self.credit)) +"\n"
-            f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+            f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
             f.write(transaction)
             f.close()
         else:
@@ -151,7 +151,7 @@ class Admin(User):
                     collection.update_one(buyerQuery, buyerCredit)
                     collection.update_one(sellerQuery, sellerCredit)
                     transaction = '05' + " " + buyer + " " + seller + " " + str(credit)+"\n"
-                    f = open("daily_transaction_file.txt", "a")
+                    f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                     f.write(transaction)
                     f.close()
                 else:
@@ -188,7 +188,7 @@ class Admin(User):
 
                 #add the transaction to the daily transaction file 
                 transaction = '06' + " " + str(user.getUsername()) + " " + user.getType() + " " + str(user.getCredit()+credit)+"\n"
-                f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+                f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                 f.write(transaction) 
                 f.close()
             else:

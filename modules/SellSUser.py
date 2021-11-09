@@ -31,7 +31,7 @@ class SSUser(User):
         #format of vars for list: [title, numtickets, price]
         self.appendEvent([title, numTickets, price])
         transaction = "03 " + str(self.getUsername() + (" " * (15 - len(self.getUsername())))) + " " + str(title + (" " * (25 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(price)))) + str(price)) +"\n"
-        f = open("daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+        f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
         f.write(transaction) 
         f.close()
         print("Event Created - " +"Event Name: " +title +" Ticket Price: " +str(price) +" Number of tickets to be sold: " +str(numTickets))
