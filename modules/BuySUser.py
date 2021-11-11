@@ -52,7 +52,7 @@ class BSUser(User):
 
                     eventCollection.update_one(eventQuery, ticketsLeft)
                     transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
-                    f = open("daily_transaction_file.txt", "a") 
+                    f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                     f.write(transaction) 
                     f.close()
                     print("Transaction Confirmed")

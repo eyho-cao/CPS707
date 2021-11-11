@@ -14,18 +14,24 @@ class SSUser(User):
         """
         create new event to sell
         """
+        eventObj = Event.getEvent(title)
+        if(eventObj != None):
+            raise ValueError("ERROR: SSUser sell: Event name already used!")
         if(price > 999.99):
             raise ValueError("ERROR: SSUser sell: Sell Price cannot exceed $999.99")
+        if(price < 0):
+            raise ValueError("ERROR: SSUser sell: Sell Price cannot be a negative number")
         if(len(title) > 25):
             raise ValueError("ERROR: SSUser sell: Event Title cannot exceed 25 characters")
-        eventQuery ={"events": title}
-        if(not (len(eventCollection.find_one(eventQuery)) == 1)):
-            raise ValueError("ERROR: SSUser sell: Event name already used")
         if(numTickets > 100):
            raise ValueError("ERROR: SSUser sell: Event cannot have more than 100 tickets")
-        #do stuff
-        #add to transaction file NOTE: since the event cant sell tickets until after the seller user logs off i think it might be best if we run a routine right before logging out that then adds the event
-        transaction = "03 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
-        f = open("daily_transaction_file.txt", "a") 
+        if(numTickets < 0):
+            raise ValueError("ERROR: SSUser sell: Event cannot have a negative number of tickets")
+
+        #format of vars for list: [title, numtickets, price]
+        self.appendEvent([title, numTickets, price])
+        transaction = "03 " + str(self.getUsername() + (" " * (15 - len(self.getUsername())))) + " " + str(title + (" " * (25 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(price)))) + str(price)) +"\n"
+        f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
         f.write(transaction) 
-        print("Event Created - " +"Event Name: " +title +"Ticket Price: " +price +" Number of tickets to be sold: " +numTickets)
+        f.close()
+        print("Event Created - " +"Event Name: " +title +" Ticket Price: " +str(price) +" Number of tickets to be sold: " +str(numTickets))

@@ -1,4 +1,5 @@
 import pymongo
+import os
 from datetime import datetime
 
 # initialize connection to mongoDB 
@@ -66,7 +67,7 @@ class User():
         collection.delete_one({"username": self.username})
         #add this transaction to the daily transaction file 
         transaction = "02" + str(self.username + ("_" * (15 - len(self.username)))) + "_" + self.type + "_" + str(str(self.credit) + ("_" * (9 - len(str(self.credit)))))
-        f = open("daily_transaction_file.txt", "a") 
+        f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
         f.write(transaction) 
         """
         if(credit >= 0):
@@ -81,7 +82,7 @@ class User():
 
                 #add the transaction to the daily transaction file 
                 transaction = '06' + " " + str(self.getUsername()) + " " + self.getType() + " " + str(str(self.credit+credit))+"\n"
-                f = open("daily_transaction_file.txt", "a") 
+                f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
                 f.write(transaction) 
                 f.close()
             else:
@@ -108,8 +109,10 @@ class User():
         now = datetime.now()
         time = now.strftime("%H:%M:%S")
         date = now.date()
-        for i in self.newEventList:
-            self.createEvent(str(i[0]), float(i[1]), float(i[2]), date, time)
+        eventList = self.getEventList()
+        if(len(eventList) >0):
+            for i in eventList:
+                self.createEvent(str(i[0]), float(i[1]), float(i[2]), date, time)
 
     def createEvent(self, name, price, quantity, date, time):
         """
@@ -136,7 +139,7 @@ class User():
                             "quantity": quantity,
                             #"datetime": dateTime,
                             "date" : datetime.now(),
-                            "owner": self.getUsername()
+                            "owner": owner
                         }
 
                         eventCollection.insert_one(event)
@@ -181,7 +184,7 @@ class User():
 
         #add the transaction to the daily transaction file 
         transaction = '00' + " " + str(self.username) + " " + self.type + " " + str(str(self.credit))+"\n"
-        f = open("daily_transaction_file.txt", "a") 
+        f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
         f.write(transaction) 
         f.close()
 
