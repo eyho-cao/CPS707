@@ -58,7 +58,7 @@ class Admin(User):
 
     def buy(self, title, numTickets, sellName):
         sellerQuery = {"username:": sellName}
-        eventQuery = {"events": title}
+        eventQuery = {"name": title}
         sellObj = User.getUser(self, sellName)
         if(sellObj is None):
             raise ValueError("ERROR: Admin buy: Invalid Seller")
@@ -122,12 +122,19 @@ class Admin(User):
         elif(User.getUser(self, username)):
             #delete the user from the database 
             collection.delete_one({"username": username})
+            for event in eventCollection.find({"owner": username}): 
+                eventQuery = {"name": event.get("name")}
+                ticketsLeft = { "$set": {
+                    "quantity": 0
+                }}
 
+                eventCollection.update_one(eventQuery, ticketsLeft)
             #add this transaction to the daily transaction file 
             transaction = "02 " + str(self.username) + " " + self.type + " " + str(str(self.credit)) +"\n"
             f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
             f.write(transaction)
             f.close()
+            print("User '" +username +"' deleted"  )
         else:
             raise ValueError("ERROR: Admin deleteUser: User not found")
 
