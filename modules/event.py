@@ -28,6 +28,7 @@ class Event():
             self.quantity = result.get('quantity')
             self.dateTime = result.get('date')
             self.owner = result.get('owner')
+            self.attendees = result.get('attendees') 
         else:
             raise ValueError("ERROR: Event __init__: Event does not exist")
 
@@ -55,7 +56,14 @@ class Event():
         Return quantity of tickets available for event
         """
         return self.quantity
+    
+    def getAttendees(self):
+        """
+        Return guestlist 
+        """
 
+        return self.attendees 
+    
     def setQuantity(self, quantity):
         self.quantity = quantity
 

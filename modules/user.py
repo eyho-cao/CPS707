@@ -139,7 +139,8 @@ class User():
                             "quantity": quantity,
                             #"datetime": dateTime,
                             "date" : datetime.now(),
-                            "owner": owner
+                            "owner": owner,
+                            "attendees": {} 
                         }
 
                         eventCollection.insert_one(event)

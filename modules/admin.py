@@ -18,6 +18,8 @@ collection = db["users"]
 eventCollection = db["events"]
 
 class Admin(User):
+    
+    
     def createUser(self, username, type, credit=0):
         """
         Create a User object 
@@ -57,32 +59,45 @@ class Admin(User):
             raise ValueError('ERROR: Admin createUser: Username is not unique')
 
     def buy(self, title, numTickets, sellName):
+        
         sellerQuery = {"username:": sellName}
         eventQuery = {"name": title}
         sellObj = User.getUser(self, sellName)
+        event = Event(title)
+        
         if(sellObj is None):
             raise ValueError("ERROR: Admin buy: Invalid Seller")
-
-        event = Event(title)
 
         if(event is None):
             raise ValueError("ERROR: Admin buy: Invalid Title")
 
         remainingTick = event.getQuantity()-numTickets #get number of tickets left in event ##NOTE: IM NOT SURE IF THIS IS HOW ITS ACTUALLY DONE
         titlePrice = event.getPrice()
+        
         if(remainingTick >=0):
             print("Price per Ticket: " +str(titlePrice) +"\nTotal Price: " +str(titlePrice*numTickets))
             userInput = input("Confirm Transaction Y/N")
             if(userInput == "Y" or userInput == "yes" or userInput == "Yes" or userInput == "y"):
-                ticketsLeft = { "$set": {
-                    "quantity": remainingTick
-                }}
+                
+                attendees = event.getAttendees()
+                
+                if(str(self.getUsername()) in attendees):
+                    attendees[str(self.getUsername())] += numTickets
+                else:
+                    attendees[str(self.getUsername())] = numTickets
+                    
+                query = {
+                    "$set":{
+                        "quantity": remainingTick,
+                        "attendees": attendees
+                    }
+                }
 
-                eventCollection.update_one(eventQuery, ticketsLeft)
-                transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
-                f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
-                f.write(transaction) 
-                f.close()
+                eventCollection.update_one(eventQuery, query)
+                #transaction = "04 " + str(self.username + (" " * (15 - len(self.username)))) + " " + str(title + (" " * (19 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(titlePrice)))) + str(titlePrice)) +"\n"
+                #f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
+                #f.write(transaction) 
+                #f.close()
                 print("Transaction Confirmed")
             else:
                 print("Transaction Cancelled")
@@ -106,6 +121,7 @@ class Admin(User):
             raise ValueError("ERROR: Admin sell: Event cannot have a negative number of tickets")
 
         #format of vars for list: [title, numtickets, price]
+        
         self.appendEvent([title, numTickets, price])
         transaction = "03 " + str(self.getUsername() + (" " * (15 - len(self.getUsername())))) + " " + str(title + (" " * (25 - len(title)))) + " " + ("0" * (3 - len(str(numTickets))) + str(str(numTickets))) + " " + str(("0" * (6 - len(str(price)))) + str(price)) +"\n"
         f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
@@ -262,6 +278,8 @@ class Admin(User):
         f = open(file, "a")
         f.write("00")
         f.close()
+        
+        
     def purgetransFiles(self):
         transFilespath = "..\\modules\\TransactionFiles"
         for filename in glob.glob(transFilespath +'\\*.txt'):
