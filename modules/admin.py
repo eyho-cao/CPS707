@@ -138,13 +138,8 @@ class Admin(User):
         elif(User.getUser(self, username)):
             #delete the user from the database 
             collection.delete_one({"username": username})
-            for event in eventCollection.find({"owner": username}): 
-                eventQuery = {"name": event.get("name")}
-                ticketsLeft = { "$set": {
-                    "quantity": 0
-                }}
-
-                eventCollection.update_one(eventQuery, ticketsLeft)
+            #cancel tickets and issue refunds
+            cancelEvent(username)
             #add this transaction to the daily transaction file 
             transaction = "02 " + str(self.username) + " " + self.type + " " + str(str(self.credit)) +"\n"
             f = open("..\\modules\\TransactionFiles\\daily_transaction_file_" +str(self.getUsername()) +".txt", "a") 
@@ -153,6 +148,45 @@ class Admin(User):
             print("User '" +username +"' deleted"  )
         else:
             raise ValueError("ERROR: Admin deleteUser: User not found")
+
+    def cancelEvent(self, username):
+        '''
+        Delete a ticket from the DB and issue refunds to attendees
+        '''
+        #iterate through each event owned by username, and set the tickets to event to 0
+        for event in eventCollection.find({"owner": username}): 
+            eventQuery = {"name": event.get("name")}
+            ticketsLeft = { "$set": {
+                "quantity": 0
+            }}
+            eventCollection.update_one(eventQuery, ticketsLeft)
+            attendees = event.get("attendees")
+            price = event.get("price")
+            tempEvent = Event(event.get('name'))
+            attendees = tempEvent.getAttendees()
+            #iterate through each attendee and issue refunds, then 0 their tickets to the event
+            for user, numTickets in attendees.items():
+                #refund user
+                credit = self.getUser(user).getCredit() + (numTickets*price)
+                newCredit = {
+                    "$set":{
+                        "credit": credit
+                    }
+                }
+                collection.update_one({'username': user}, newCredit)
+                #remove the users tickets from the event
+                attendees[user] = 0
+                query = {
+                    "$set":{
+                        "attendees": attendees
+                    }
+                }
+                eventCollection.update_one(eventQuery, query)
+        #finally, delete the event. 
+        eventCollection.delete_one({"name": event.get("name")})
+            
+        
+
 
     def deleteTicket(ticket):
         """
