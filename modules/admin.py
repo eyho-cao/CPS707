@@ -225,8 +225,6 @@ class Admin(User):
             raise ValueError("ERROR: Admin refund: Seller does not exist")
         elif(credit < 0):
             raise ValueError("ERROR: Admin refund: Invalid value for credit")
-
-
        
     def addCredit(self, username, credit):
         """
